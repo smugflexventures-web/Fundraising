@@ -63,9 +63,7 @@ class App
         }
 
         $this->request = new Request();
-        $this->router = new Router();
-
-        require dirname(__DIR__, 2) . '/routes/api.php';
+        $this->router = require dirname(__DIR__, 2) . '/routes/api.php';
 
         $this->router->dispatch(
             $this->request->getMethod(),
