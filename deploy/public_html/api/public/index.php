@@ -21,19 +21,25 @@ set_exception_handler(function ($e) {
     exit;
 });
 
-// Check vendor directory exists
-$vendorPath = dirname(__DIR__) . '/vendor/autoload.php';
-if (!file_exists($vendorPath)) {
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Server setup incomplete: dependencies not installed. Run composer install.',
-        'hint' => 'Upload vendor/ directory or run composer install on the server',
-    ]);
-    exit;
-}
+// Fallback PSR-4 autoloader for App\ namespace (works without composer vendor)
+spl_autoload_register(function ($class) {
+    $prefix = 'App\\';
+    $baseDir = dirname(__DIR__) . '/app/';
 
-require_once $vendorPath;
+    if (str_starts_with($class, $prefix)) {
+        $relativeClass = substr($class, strlen($prefix));
+        $file = $baseDir . str_replace('\\', '/', $relativeClass) . '.php';
+        if (file_exists($file)) {
+            require_once $file;
+        }
+    }
+});
+
+// Load Composer autoloader for external packages (firebase/php-jwt, phpmailer)
+$vendorPath = dirname(__DIR__) . '/vendor/autoload.php';
+if (file_exists($vendorPath)) {
+    require_once $vendorPath;
+}
 
 use App\Core\App;
 

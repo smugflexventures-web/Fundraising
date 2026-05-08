@@ -4,22 +4,34 @@ namespace App\Core;
 
 class Request
 {
-    private $method;
-    private $uri;
-    private $body;
-    private $query;
-    private $files;
-    private $headers;
-    private $server;
+    private string $method;
+    private string $uri;
+    private array $body;
+    private array $query;
+    private array $files;
+    private array $headers;
+    private array $server;
 
     public function __construct()
     {
         $this->method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
         $this->uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $this->uri = str_replace('/api', '', $this->uri);
+
+        // Strip the /api prefix (deployment rewrites /api/* to api/public/index.php)
+        // This ensures /api/auth/login becomes /auth/login for route matching
+        if (str_starts_with($this->uri, '/api/')) {
+            $this->uri = substr($this->uri, 4); // remove '/api' prefix, keep leading slash
+        } elseif ($this->uri === '/api') {
+            $this->uri = '/';
+        }
+
+        // Strip /public/index.php if present in URI (happens on some server configs)
+        $this->uri = str_replace('/public/index.php', '', $this->uri);
+
         if ($this->uri !== '/' && str_ends_with($this->uri, '/')) {
             $this->uri = rtrim($this->uri, '/');
         }
+
         $this->query = $_GET;
         $this->files = $_FILES;
         $this->server = $_SERVER;
@@ -77,32 +89,32 @@ class Request
         return $this->body;
     }
 
-    public function input($key, $default = null)
+    public function input(string $key, $default = null)
     {
         return $this->body[$key] ?? $default;
     }
 
-    public function query($key, $default = null)
+    public function query(string $key, $default = null)
     {
         return $this->query[$key] ?? $default;
     }
 
-    public function file($key)
+    public function file(string $key)
     {
         return $this->files[$key] ?? null;
     }
 
-    public function files()
+    public function files(): array
     {
         return $this->files;
     }
 
-    public function header($key, $default = null)
+    public function header(string $key, $default = null)
     {
         return $this->headers[$key] ?? $default;
     }
 
-    public function getAuthorizationHeader()
+    public function getAuthorizationHeader(): ?string
     {
         $authHeader = $this->header('Authorization');
         if (!$authHeader) {
@@ -111,7 +123,7 @@ class Request
         return $authHeader;
     }
 
-    public function getBearerToken()
+    public function getBearerToken(): ?string
     {
         $header = $this->getAuthorizationHeader();
         if ($header && preg_match('/Bearer\s(\S+)/', $header, $matches)) {
