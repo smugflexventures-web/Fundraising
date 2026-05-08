@@ -1,3 +1,9 @@
+# Route all requests to index.php (most reliable method for cPanel)
+FallbackResource /api/index.php
+
+# Pass Authorization header for CGI/FastCGI
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=
+
 # Prevent directory browsing
 Options -Indexes
 
