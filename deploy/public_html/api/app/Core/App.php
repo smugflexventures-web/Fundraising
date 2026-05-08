@@ -26,6 +26,18 @@ class App
 
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 
+        // Allow the requesting origin if it matches the server's own host (same-origin SPA)
+        $serverHost = $_SERVER['HTTP_HOST'] ?? '';
+        if ($origin && $serverHost) {
+            $originHost = parse_url($origin, PHP_URL_HOST);
+            $originPort = parse_url($origin, PHP_URL_PORT);
+            $expectedOrigin = 'https://' . $serverHost;
+            $expectedOriginHttp = 'http://' . $serverHost;
+            if ($origin === $expectedOrigin || $origin === $expectedOriginHttp) {
+                $allowedOrigins[] = $origin;
+            }
+        }
+
         if (in_array($origin, $allowedOrigins)) {
             header("Access-Control-Allow-Origin: {$origin}");
         }
