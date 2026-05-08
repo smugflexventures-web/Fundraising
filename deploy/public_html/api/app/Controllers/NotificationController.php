@@ -7,7 +7,7 @@ use App\Core\Response;
 
 class NotificationController
 {
-    private $notificationModel;
+    private Notification $notificationModel;
 
     public function __construct()
     {
@@ -33,7 +33,7 @@ class NotificationController
         return Response::success(['unread_count' => $count]);
     }
 
-    public function markRead($params)
+    public function markRead(array $params)
     {
         $id = $params['id'] ?? null;
         if (!$id) {
@@ -51,7 +51,7 @@ class NotificationController
         return Response::success([], 'All notifications marked as read');
     }
 
-    public function destroy($params)
+    public function destroy(array $params)
     {
         $id = $params['id'] ?? null;
         if (!$id) {
@@ -59,6 +59,6 @@ class NotificationController
         }
 
         $this->notificationModel->delete($id);
-        return Response::success([], 'Notification deleted');
+        return Response::success([], 'Notification removed');
     }
 }

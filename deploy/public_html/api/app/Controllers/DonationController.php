@@ -14,8 +14,8 @@ use App\Core\Response;
 
 class DonationController
 {
-    private $donationModel;
-    private $paymentModel;
+    private Donation $donationModel;
+    private Payment $paymentModel;
 
     public function __construct()
     {
@@ -23,7 +23,7 @@ class DonationController
         $this->paymentModel = new Payment();
     }
 
-    public function index($params)
+    public function index(array $params)
     {
         $authUser = $GLOBALS['auth_user'] ?? null;
         $page = (int)($_GET['page'] ?? 1);
@@ -39,22 +39,22 @@ class DonationController
         return Response::paginated($result['data'], $result['total'], $page, $perPage);
     }
 
-    public function show($params)
+    public function show(array $params)
     {
         $id = $params['id'] ?? null;
         if (!$id) {
-            return Response::error('Donation ID is required', 400);
+            return Response::error('Contribution ID is required', 400);
         }
 
         $donation = $this->donationModel->findById($id);
         if (!$donation) {
-            return Response::notFound('Donation not found');
+            return Response::notFound('Contribution record not found');
         }
 
         return Response::success(['donation' => $donation]);
     }
 
-    public function initialize($params)
+    public function initialize(array $params)
     {
         $authUser = $GLOBALS['auth_user'] ?? null;
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
@@ -119,13 +119,19 @@ class DonationController
             'Content-Type: application/json',
         ]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        $curlError = curl_error($ch);
+        // curl_close deprecated in PHP 8.5; handles auto-close on scope exit
 
         $paystackResponse = json_decode($response, true);
+
+        if ($curlError) {
+            return Response::error('Payment service is currently unavailable. Please try again later.', 503);
+        }
 
         if ($httpCode === 200 && ($paystackResponse['status'] ?? false)) {
             return Response::success([
@@ -136,10 +142,10 @@ class DonationController
             ], 'Payment initialized');
         }
 
-        return Response::error('Failed to initialize payment. Please try again.', 500);
+        return Response::error('Payment could not be initialized at this time. Please try again.', 500);
     }
 
-    public function verify($params)
+    public function verify(array $params)
     {
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
         $reference = $input['reference'] ?? $_GET['reference'] ?? null;
@@ -150,7 +156,11 @@ class DonationController
 
         $donation = $this->donationModel->findByReference($reference);
         if (!$donation) {
-            return Response::notFound('Donation not found');
+            return Response::notFound('Contribution record not found');
+        }
+
+        if ($donation['status'] === 'completed') {
+            return Response::success(['donation' => $donation], 'This payment has already been verified');
         }
 
         $paystackSecretKey = Config::get('PAYSTACK_SECRET_KEY', '');
@@ -161,12 +171,18 @@ class DonationController
             'Authorization: Bearer ' . $paystackSecretKey,
         ]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 
         $response = curl_exec($ch);
-        curl_close($ch);
+        $curlError = curl_error($ch);
+        // curl_close deprecated in PHP 8.5; handles auto-close on scope exit
 
         $paystackResponse = json_decode($response, true);
+
+        if ($curlError) {
+            return Response::error('An unexpected error occurred while verifying your payment. Please try again later.', 503);
+        }
 
         if ($paystackResponse['status'] ?? false) {
             $paystackData = $paystackResponse['data'];
@@ -196,7 +212,7 @@ class DonationController
                         $newFunded = $request['amount_funded'] + $donation['amount'];
                         $requestModel->update($donation['request_id'], ['amount_funded' => $newFunded]);
                         if ($newFunded >= $request['amount_needed']) {
-                            $requestModel->updateStatus($donation['request_id'], 'funded', null, 'Fully funded through donations');
+                            $requestModel->updateStatus($donation['request_id'], 'funded', null, 'Fully funded through contributions');
                         }
                     }
                 }
@@ -214,28 +230,28 @@ class DonationController
 
                 Helpers::createNotification(
                     $donation['donor_id'],
-                    'Donation Successful',
-                    'Your donation of ₦' . number_format($donation['amount'], 2) . ' was successful. Thank you!',
+                    'Contribution Processed',
+                    'Your contribution of NGN ' . number_format($donation['amount'], 2) . ' has been processed and recorded.',
                     'success',
                     '/donor/donations'
                 );
 
-                Helpers::logActivity($donation['donor_id'], 'donation_completed', "Donation {$reference} completed");
+                Helpers::logActivity($donation['donor_id'], 'donation_completed', "Contribution {$reference} completed");
 
                 $updatedDonation = $this->donationModel->findById($donation['id']);
-                return Response::success(['donation' => $updatedDonation], 'Payment verified and donation completed');
+                return Response::success(['donation' => $updatedDonation], 'Payment verified and contribution recorded');
             } else {
                 $this->donationModel->updateStatus($donation['id'], 'failed');
                 $this->paymentModel->updateStatusByDonationId($donation['id'], 'failed', json_encode($paystackData));
 
-                return Response::error('Payment was not successful', 400);
+                return Response::error('The payment was not completed successfully', 400);
             }
         }
 
-        return Response::error('Unable to verify payment', 500);
+        return Response::error('Payment verification could not be completed at this time', 500);
     }
 
-    public function history($params)
+    public function history(array $params)
     {
         $authUser = $GLOBALS['auth_user'] ?? null;
         $page = (int)($_GET['page'] ?? 1);
@@ -244,5 +260,43 @@ class DonationController
         $result = $this->donationModel->getByDonorId($authUser['user_id'], $page, $perPage);
 
         return Response::paginated($result['data'], $result['total'], $page, $perPage);
+    }
+
+    public function donorStats(array $params)
+    {
+        $authUser = $GLOBALS['auth_user'] ?? null;
+        if (!$authUser || ($authUser['role'] ?? '') !== 'donor') {
+            return Response::forbidden('Only donors can access this endpoint');
+        }
+
+        $donorId = $authUser['user_id'];
+        $db = \App\Core\Database::getInstance();
+
+        $totalDonated = $db->fetch(
+            "SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE donor_id = ? AND status = 'completed'",
+            [$donorId]
+        )['total'] ?? 0;
+
+        $donationCount = $db->fetch(
+            "SELECT COUNT(*) as count FROM donations WHERE donor_id = ? AND status = 'completed'",
+            [$donorId]
+        )['count'] ?? 0;
+
+        $campaignsSupported = $db->fetch(
+            "SELECT COUNT(DISTINCT campaign_id) as count FROM donations WHERE donor_id = ? AND campaign_id IS NOT NULL AND status = 'completed'",
+            [$donorId]
+        )['count'] ?? 0;
+
+        $pendingAmount = $db->fetch(
+            "SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE donor_id = ? AND status = 'pending'",
+            [$donorId]
+        )['total'] ?? 0;
+
+        return Response::success([
+            'total_donated' => (float)$totalDonated,
+            'donation_count' => (int)$donationCount,
+            'campaigns_supported' => (int)$campaignsSupported,
+            'pending_amount' => (float)$pendingAmount,
+        ]);
     }
 }

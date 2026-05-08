@@ -41,10 +41,10 @@ const AdminUsers = () => {
   const handleVerify = async (id) => {
     try {
       await api.admin.verifyUser(id);
-      toast.success('User verified');
+      toast.success('Account verification confirmed');
       fetchUsers();
     } catch {
-      toast.error('Failed to verify user');
+      toast.error('Verification could not be completed at this time');
     }
   };
 
@@ -59,19 +59,19 @@ const AdminUsers = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this user?')) return;
+    if (!window.confirm('This account will be permanently removed. Are you sure?')) return;
     try {
       await api.admin.deleteUser(id);
-      toast.success('User deleted');
+      toast.success('Account removed');
       fetchUsers();
     } catch {
-      toast.error('Failed to delete user');
+      toast.error('Account could not be removed at this time');
     }
   };
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">User Management</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Account Management</h1>
 
       <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <form onSubmit={handleSearch} className="flex gap-2 flex-1">
@@ -84,7 +84,7 @@ const AdminUsers = () => {
               placeholder="Search by name, email, or student ID..."
             />
           </div>
-          <button type="submit" className="btn-primary text-sm">Search</button>
+          <button type="submit" className="btn-primary text-sm">Find</button>
         </form>
         <div className="flex gap-2">
           {['', 'student', 'donor', 'admin'].map((role) => (

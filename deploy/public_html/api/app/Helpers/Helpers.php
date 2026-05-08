@@ -17,7 +17,7 @@ class Helpers
         return $prefix . '_' . strtoupper(substr(md5(uniqid(mt_rand(), true)), 0, 12));
     }
 
-    public static function formatCurrency($amount, $symbol = '₦')
+    public static function formatCurrency($amount, $symbol = 'NGN ')
     {
         return $symbol . number_format((float)$amount, 2);
     }
@@ -72,9 +72,11 @@ class Helpers
     public static function paginate($query, $countQuery, $params, $page = 1, $perPage = 10)
     {
         $db = \App\Core\Database::getInstance();
+        $page = max(1, (int)$page);
+        $perPage = max(1, min(100, (int)$perPage));
         $offset = ($page - 1) * $perPage;
         $total = $db->fetch($countQuery, $params)['total'] ?? 0;
-        $data = $db->fetchAll($query . " LIMIT {$perPage} OFFSET {$offset}", $params);
+        $data = $db->fetchAll($query . " LIMIT ? OFFSET ?", array_merge($params, [$perPage, $offset]));
 
         return [
             'data' => $data,

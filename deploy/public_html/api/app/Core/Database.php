@@ -7,8 +7,8 @@ use PDOException;
 
 class Database
 {
-    private static $instance = null;
-    private $pdo;
+    private static ?Database $instance = null;
+    private PDO $pdo;
 
     private function __construct()
     {
@@ -30,10 +30,13 @@ class Database
                 PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci",
             ]);
         } catch (PDOException $e) {
+            error_log('Database connection failed: ' . $e->getMessage());
             http_response_code(500);
             echo json_encode([
                 'success' => false,
-                'message' => 'Database connection failed: ' . $e->getMessage(),
+                'message' => Config::get('APP_DEBUG', 'false') === 'true'
+                    ? 'Database connection failed: ' . $e->getMessage()
+                    : 'A database error occurred. Please try again later.',
             ]);
             exit;
         }
@@ -52,38 +55,38 @@ class Database
         return $this->pdo;
     }
 
-    public function query($sql, $params = [])
+    public function query(string $sql, array $params = []): \PDOStatement
     {
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
         return $stmt;
     }
 
-    public function fetch($sql, $params = [])
+    public function fetch(string $sql, array $params = []): ?array
     {
         $stmt = $this->query($sql, $params);
         return $stmt->fetch();
     }
 
-    public function fetchAll($sql, $params = [])
+    public function fetchAll(string $sql, array $params = []): array
     {
         $stmt = $this->query($sql, $params);
         return $stmt->fetchAll();
     }
 
-    public function insert($sql, $params = [])
+    public function insert(string $sql, array $params = []): string
     {
         $this->query($sql, $params);
         return $this->pdo->lastInsertId();
     }
 
-    public function update($sql, $params = [])
+    public function update(string $sql, array $params = []): int
     {
         $stmt = $this->query($sql, $params);
         return $stmt->rowCount();
     }
 
-    public function delete($sql, $params = [])
+    public function delete(string $sql, array $params = []): int
     {
         $stmt = $this->query($sql, $params);
         return $stmt->rowCount();

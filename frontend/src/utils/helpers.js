@@ -1,5 +1,5 @@
 export const formatCurrency = (amount) => {
-  return '₦' + Number(amount || 0).toLocaleString('en-NG', {
+  return 'NGN ' + Number(amount || 0).toLocaleString('en-NG', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });

@@ -18,11 +18,11 @@ const LoginPage = () => {
     setLoading(true);
     try {
       const res = await login({ email, password });
-      toast.success('Login successful!');
+      toast.success('Signed in');
       const role = res.data.user.role;
       navigate(role === 'admin' ? '/admin' : role === 'student' ? '/student' : '/donor');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Invalid credentials');
+      toast.error(err.response?.data?.message || 'The credentials provided could not be verified');
     } finally {
       setLoading(false);
     }
@@ -40,8 +40,8 @@ const LoginPage = () => {
             <div className="w-14 h-14 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Heart className="w-7 h-7 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-800">Welcome Back</h1>
-            <p className="text-sm text-gray-500 mt-1">Sign in to your CampusFund account</p>
+            <h1 className="text-2xl font-bold text-gray-800">Sign In</h1>
+            <p className="text-sm text-gray-500 mt-1">Access your CampusFund account</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -84,7 +84,7 @@ const LoginPage = () => {
 
             <div className="flex items-center justify-between">
               <Link to="/forgot-password" className="text-sm text-primary-600 hover:text-primary-700">
-                Forgot password?
+                Reset Password
               </Link>
             </div>
 
@@ -94,9 +94,9 @@ const LoginPage = () => {
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-6">
-            Don't have an account?{' '}
+            Need an account?{' '}
             <Link to="/register" className="text-primary-600 font-medium hover:text-primary-700">
-              Sign up
+              Register
             </Link>
           </p>
         </div>

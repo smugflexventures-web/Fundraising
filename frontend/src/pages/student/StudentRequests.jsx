@@ -33,7 +33,7 @@ const StudentRequests = () => {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">My Requests</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Submitted Requests</h1>
         <Link to="/student/requests/new" className="btn-primary text-sm flex items-center gap-2">
           <PlusCircle className="w-4 h-4" /> New Request
         </Link>
@@ -56,7 +56,7 @@ const StudentRequests = () => {
       {loading ? <LoadingSpinner /> : requests.length === 0 ? (
         <div className="glass rounded-2xl p-8 text-center">
           <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <h3 className="text-gray-600 font-medium">No requests found</h3>
+          <h3 className="text-gray-600 font-medium">No assistance requests on file</h3>
         </div>
       ) : (
         <>

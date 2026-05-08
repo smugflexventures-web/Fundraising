@@ -11,11 +11,11 @@ class StudentMiddleware
         $user = $GLOBALS['auth_user'] ?? null;
 
         if (!$user) {
-            return Response::unauthorized('Authentication required');
+            return Response::unauthorized('Authentication is required');
         }
 
         if (($user['role'] ?? '') !== 'student') {
-            return Response::forbidden('Student access required');
+            return Response::forbidden('Student account access is required');
         }
 
         return null;

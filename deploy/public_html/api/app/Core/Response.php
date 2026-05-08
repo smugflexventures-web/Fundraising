@@ -4,7 +4,7 @@ namespace App\Core;
 
 class Response
 {
-    public static function json($data, $statusCode = 200)
+    public static function json(array $data, int $statusCode = 200)
     {
         http_response_code($statusCode);
         header('Content-Type: application/json; charset=utf-8');
@@ -12,7 +12,7 @@ class Response
         exit;
     }
 
-    public static function success($data = [], $message = 'Success', $statusCode = 200)
+    public static function success(array $data = [], string $message = 'Success', int $statusCode = 200)
     {
         self::json([
             'success' => true,
@@ -21,7 +21,7 @@ class Response
         ], $statusCode);
     }
 
-    public static function error($message = 'Error', $statusCode = 400, $errors = [])
+    public static function error(string $message = 'Error', int $statusCode = 400, array $errors = [])
     {
         $response = [
             'success' => false,
@@ -33,27 +33,27 @@ class Response
         self::json($response, $statusCode);
     }
 
-    public static function unauthorized($message = 'Unauthorized')
+    public static function unauthorized($message = 'Authentication is required')
     {
         self::error($message, 401);
     }
 
-    public static function forbidden($message = 'Forbidden')
+    public static function forbidden($message = 'Access denied')
     {
         self::error($message, 403);
     }
 
-    public static function notFound($message = 'Not found')
+    public static function notFound($message = 'The requested resource was not found')
     {
         self::error($message, 404);
     }
 
-    public static function serverError($message = 'Internal server error')
+    public static function serverError($message = 'An internal error occurred. Please try again later.')
     {
         self::error($message, 500);
     }
 
-    public static function paginated($data, $total, $page, $perPage, $message = 'Success')
+    public static function paginated(array $data, int $total, int $page, int $perPage, string $message = 'Retrieved successfully')
     {
         $totalPages = ceil($total / $perPage);
         self::json([

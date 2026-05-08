@@ -301,3 +301,27 @@ INSERT INTO settings (setting_key, setting_value) VALUES
 ('enable_registration', 'true'),
 ('enable_email_verification', 'true'),
 ('maintenance_mode', 'false');
+
+-- ============================================
+-- Performance Indexes
+-- ============================================
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_role ON users(role);
+CREATE INDEX idx_users_is_active ON users(is_active);
+CREATE INDEX idx_student_requests_user_id ON student_requests(user_id);
+CREATE INDEX idx_student_requests_status ON student_requests(status);
+CREATE INDEX idx_student_requests_category ON student_requests(category);
+CREATE INDEX idx_campaigns_status ON campaigns(status);
+CREATE INDEX idx_campaigns_is_featured ON campaigns(is_featured);
+CREATE INDEX idx_donations_donor_id ON donations(donor_id);
+CREATE INDEX idx_donations_campaign_id ON donations(campaign_id);
+CREATE INDEX idx_donations_status ON donations(status);
+CREATE INDEX idx_donations_reference ON donations(reference);
+CREATE INDEX idx_donations_created_at ON donations(created_at);
+CREATE INDEX idx_notifications_user_id ON notifications(user_id);
+CREATE INDEX idx_notifications_is_read ON notifications(is_read);
+CREATE INDEX idx_activity_logs_user_id ON activity_logs(user_id);
+CREATE INDEX idx_activity_logs_action ON activity_logs(action);
+CREATE INDEX idx_activity_logs_created_at ON activity_logs(created_at);
+CREATE INDEX idx_password_resets_token ON password_resets(token);
+CREATE INDEX idx_settings_key ON settings(setting_key);

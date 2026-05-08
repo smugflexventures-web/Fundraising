@@ -1,59 +1,58 @@
-# CampusFund - Secure Campus Fundraising and Donation Management System
+# CampusFund — Campus Financial Assistance & Contribution Platform
 
-A comprehensive web application for managing student financial assistance requests, fundraising campaigns, and secure donations.
+A structured web platform for managing student financial assistance requests, fundraising campaigns, and secure contributions within a university community.
 
-## 🎯 Overview
+## Overview
 
-CampusFund is a secure, production-ready platform that connects students in need with donors who want to make a difference. The system provides role-based access for students, donors, and administrators with full CRUD operations, payment integration, and real-time analytics.
+CampusFund connects students facing financial hardship with contributors who want to support their education. The platform provides role-based access for students, contributors, and administrators — with full request management, Paystack payment integration, email notifications, and operational analytics.
 
-## 🏗️ Tech Stack
+## Tech Stack
 
 ### Frontend
-- **React.js 18** - UI framework
-- **Vite 5** - Build tool
-- **Tailwind CSS 3** - Styling
-- **Axios** - HTTP client
-- **React Router DOM 6** - Routing
-- **React Hook Form** - Form handling
-- **React Toastify** - Notifications
-- **Framer Motion** - Animations
-- **Lucide React** - Icons
-- **Recharts** - Charts & Analytics
-- **jwt-decode** - JWT token decoding
+- **React 18** — Component-based UI
+- **Vite 5** — Build tooling
+- **Tailwind CSS 3** — Utility-first styling
+- **Axios** — HTTP client
+- **React Router DOM 6** — Client-side routing
+- **React Toastify** — Toast notifications
+- **Framer Motion** — Motion and transitions
+- **Lucide React** — Icon library
+- **Recharts** — Data visualization
+- **jwt-decode** — Client-side JWT parsing
 
 ### Backend
-- **PHP 8+** - Server-side language
-- **REST API Architecture** - API design
-- **Firebase PHP-JWT** - JWT authentication
-- **PHPMailer** - Email notifications
-- **vlucas/phpdotenv** - Environment variables
-- **Composer** - Dependency management
+- **PHP 8+** — Server-side runtime
+- **REST API** — Stateless endpoint architecture
+- **Firebase PHP-JWT** — Token-based authentication
+- **PHPMailer** — Transactional email delivery
+- **vlucas/phpdotenv** — Environment configuration
+- **Composer** — Dependency management
 
 ### Database
-- **MySQL** - Relational database
+- **MySQL** — Relational data storage
 
 ### Server
-- **Apache/XAMPP** - Web server
+- **Apache** — Production web server (cPanel deployment)
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ppp/
-├── frontend/                 # React frontend
+├── frontend/                 # React application
 │   ├── public/
 │   ├── src/
 │   │   ├── api/             # API service layer
-│   │   ├── components/      # Reusable components
-│   │   ├── context/         # React context (Auth)
-│   │   ├── layouts/         # Layout components
-│   │   ├── pages/           # Page components
-│   │   │   ├── admin/       # Admin pages
-│   │   │   ├── auth/        # Auth pages
-│   │   │   ├── donor/       # Donor pages
-│   │   │   └── student/     # Student pages
-│   │   ├── routes/          # Route configuration
-│   │   ├── services/        # API services
-│   │   ├── utils/           # Utility functions
+│   │   ├── components/      # Shared UI components
+│   │   ├── context/         # Auth context provider
+│   │   ├── layouts/         # Dashboard, Admin, Main layouts
+│   │   ├── pages/
+│   │   │   ├── admin/       # Admin panel pages
+│   │   │   ├── Auth/        # Login, Register, Password Reset
+│   │   │   ├── donor/       # Contributor dashboard & pages
+│   │   │   └── student/     # Student dashboard & pages
+│   │   ├── routes/          # Route definitions
+│   │   ├── services/        # API service modules
+│   │   ├── utils/           # Helpers, formatters, validators
 │   │   ├── App.jsx
 │   │   ├── main.jsx
 │   │   └── index.css
@@ -62,30 +61,29 @@ ppp/
 │   ├── vite.config.js
 │   ├── tailwind.config.js
 │   └── postcss.config.js
-├── backend/                  # PHP backend
+├── backend/                  # PHP REST API
 │   ├── app/
-│   │   ├── Controllers/     # API controllers
-│   │   ├── Core/            # Core framework
-│   │   ├── Helpers/         # Helper classes
-│   │   ├── Middleware/      # Auth & role middleware
-│   │   └── Models/          # Database models
-│   ├── config/
+│   │   ├── Controllers/     # Request handlers
+│   │   ├── Core/            # App bootstrap, Database, Response
+│   │   ├── Helpers/         # Mailer, Validator, JWT, Helpers
+│   │   ├── Middleware/      # Auth, Role-based guards
+│   │   └── Models/          # Data access layer
 │   ├── public/
-│   │   └── index.php        # Entry point
+│   │   └── index.php        # API entry point
 │   ├── routes/
-│   │   └── api.php          # API routes
-│   ├── storage/
-│   ├── uploads/             # File uploads
-│   ├── .env
+│   │   └── api.php          # Route definitions
+│   ├── uploads/             # User-uploaded files
 │   ├── .env.example
 │   ├── .htaccess
 │   └── composer.json
 ├── database/
-│   └── campus_fund.sql      # Database schema & seed
+│   └── campus_fund.sql      # Schema and seed data
+├── deploy/                   # Production deployment bundle
+│   └── public_html/
 └── README.md
 ```
 
-## 🚀 Setup Instructions
+## Setup Instructions
 
 ### Prerequisites
 - XAMPP (Apache + MySQL) or equivalent
@@ -95,52 +93,37 @@ ppp/
 
 ### 1. Database Setup
 
-1. Start MySQL server (via XAMPP or standalone)
+1. Start MySQL server
 2. Open phpMyAdmin or MySQL CLI
-3. Import the database schema:
+3. Import the schema:
    ```bash
    mysql -u root -p < database/campus_fund.sql
    ```
-   Or import `database/campus_fund.sql` via phpMyAdmin
 
 ### 2. Backend Setup
 
 ```bash
 cd backend
-
-# Install PHP dependencies
 composer install
-
-# Configure environment
 cp .env.example .env
-# Edit .env with your database and mail credentials
+# Edit .env with your database, mail, and Paystack credentials
 ```
 
 **Start the PHP server:**
 ```bash
-# Option 1: Using PHP built-in server
-composer start
-# or: php -S localhost:8000 -t public
+# Using PHP built-in server
+php -S localhost:8000 -t public
 
-# Option 2: Using XAMPP
-# Place the backend folder in htdocs/
-# Configure Apache virtual host to point to backend/public
+# Or place in XAMPP htdocs and configure Apache virtual host
 ```
 
 ### 3. Frontend Setup
 
 ```bash
 cd frontend
-
-# Install npm dependencies
 npm install
-
-# Start development server
-npm run dev
-# Server runs at http://localhost:5173
-
-# Build for production
-npm run build
+npm run dev        # Development server at http://localhost:5173
+npm run build      # Production build to dist/
 ```
 
 ### 4. Environment Configuration
@@ -166,44 +149,42 @@ PAYSTACK_SECRET_KEY=sk_test_xxx
 PAYSTACK_PUBLIC_KEY=pk_test_xxx
 ```
 
-## 👥 User Roles
+## User Roles
 
 ### Student
-- Register and login
+- Register and sign in
 - Submit financial assistance requests
 - Upload supporting documents
-- Track request status
-- Receive notifications
-- View approved support
+- Track request status through review stages
+- Receive status update notifications
 
-### Donor
-- Register and login
-- Browse active campaigns
-- Donate securely via Paystack
-- View donation history
-- Track donation impact
+### Contributor
+- Register and sign in
+- Browse active fundraising campaigns
+- Contribute securely via Paystack
+- View contribution history
+- Track contribution impact
 
 ### Administrator
-- Manage all users
-- Verify student accounts
-- Approve/reject assistance requests
+- Manage user accounts and verification
+- Review and process assistance requests
 - Create and manage fundraising campaigns
-- Monitor all donations
-- Generate reports (CSV export)
-- View activity logs
-- Manage system settings
+- Monitor all contributions and payments
+- Generate and export reports
+- Review system activity logs
+- Configure platform settings
 
-## 🔌 API Endpoints
+## API Endpoints
 
 ### Authentication
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/auth/register` | Register new user |
-| POST | `/api/auth/login` | Login |
-| POST | `/api/auth/logout` | Logout |
+| POST | `/api/auth/register` | Register new account |
+| POST | `/api/auth/login` | Sign in |
+| POST | `/api/auth/logout` | Sign out |
 | POST | `/api/auth/forgot-password` | Request password reset |
 | POST | `/api/auth/reset-password` | Reset password |
-| GET | `/api/auth/me` | Get current user |
+| GET | `/api/auth/me` | Get current account |
 | PUT | `/api/auth/profile` | Update profile |
 | PUT | `/api/auth/change-password` | Change password |
 
@@ -215,27 +196,27 @@ PAYSTACK_PUBLIC_KEY=pk_test_xxx
 | GET | `/api/campaigns/{id}` | Campaign details |
 | POST | `/api/campaigns` | Create campaign (Admin) |
 | PUT | `/api/campaigns/{id}` | Update campaign (Admin) |
-| DELETE | `/api/campaigns/{id}` | Delete campaign (Admin) |
+| DELETE | `/api/campaigns/{id}` | Remove campaign (Admin) |
 
 ### Student Requests
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/requests` | List requests |
+| GET | `/api/requests` | List assistance requests |
 | GET | `/api/requests/{id}` | Request details |
-| POST | `/api/requests` | Create request |
+| POST | `/api/requests` | Submit request |
 | PUT | `/api/requests/{id}` | Update request |
 | PUT | `/api/requests/{id}/status` | Update status (Admin) |
-| DELETE | `/api/requests/{id}` | Delete request |
+| DELETE | `/api/requests/{id}` | Withdraw request |
 | POST | `/api/requests/{id}/documents` | Upload documents |
 
-### Donations
+### Contributions
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/donations` | List donations |
-| GET | `/api/donations/{id}` | Donation details |
+| GET | `/api/donations` | List contributions |
+| GET | `/api/donations/{id}` | Contribution details |
 | POST | `/api/donations/initialize` | Initialize payment |
 | POST | `/api/donations/verify` | Verify payment |
-| GET | `/api/donations/history` | Donor history |
+| GET | `/api/donations/history` | Contributor history |
 
 ### Notifications
 | Method | Endpoint | Description |
@@ -244,81 +225,83 @@ PAYSTACK_PUBLIC_KEY=pk_test_xxx
 | GET | `/api/notifications/unread-count` | Unread count |
 | PUT | `/api/notifications/{id}/read` | Mark as read |
 | PUT | `/api/notifications/read-all` | Mark all read |
-| DELETE | `/api/notifications/{id}` | Delete notification |
+| DELETE | `/api/notifications/{id}` | Remove notification |
 
 ### Admin
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/admin/stats` | Dashboard statistics |
-| GET | `/api/admin/users` | List users |
-| PUT | `/api/admin/users/{id}/verify` | Verify user |
-| PUT | `/api/admin/users/{id}/toggle-status` | Toggle active |
-| DELETE | `/api/admin/users/{id}` | Delete user |
-| GET | `/api/admin/activity-logs` | Activity logs |
+| GET | `/api/admin/users` | List accounts |
+| PUT | `/api/admin/users/{id}/verify` | Verify account |
+| PUT | `/api/admin/users/{id}/toggle-status` | Toggle active status |
+| DELETE | `/api/admin/users/{id}` | Remove account |
+| GET | `/api/admin/activity-logs` | Action log |
 | GET | `/api/admin/reports` | Generate reports |
 
-## 🔒 Security Features
+## Security
 
-- **JWT Authentication** - Secure token-based auth with expiration
-- **bcrypt Password Hashing** - Industry-standard password storage
-- **SQL Injection Prevention** - PDO prepared statements throughout
-- **XSS Protection** - Input sanitization and output encoding
-- **CSRF Protection** - Token-based CSRF defense
-- **Rate Limiting** - Request throttling middleware
-- **File Upload Validation** - Type, size, and MIME verification
-- **Role-Based Access Control** - Middleware-protected routes
-- **Input Validation** - Server-side validation for all endpoints
-- **CORS Configuration** - Controlled cross-origin access
-- **Security Headers** - X-Content-Type-Options, X-Frame-Options, etc.
+- **JWT Authentication** — Token-based session management with expiration
+- **bcrypt Password Hashing** — Secure password storage
+- **SQL Injection Prevention** — PDO prepared statements
+- **XSS Protection** — Input sanitization and output encoding
+- **File Upload Validation** — Type, size, and MIME verification
+- **Role-Based Access Control** — Middleware-protected routes
+- **Input Validation** — Server-side validation on all endpoints
+- **CORS Configuration** — Controlled cross-origin access
+- **Security Headers** — X-Content-Type-Options, X-Frame-Options
 
-## 💳 Payment Integration
+## Payment Integration
 
-Paystack payment gateway is integrated for secure donation processing:
+Paystack payment gateway handles contribution processing:
 
-1. Donor initiates donation
+1. Contributor selects amount and initiates payment
 2. Backend initializes Paystack transaction
-3. Donor is redirected to Paystack payment page
-4. After payment, Paystack callback verifies transaction
-5. Donation status is updated and notifications sent
+3. Contributor completes payment on Paystack
+4. Paystack callback verifies transaction
+5. Contribution is recorded and notifications dispatched
 
-Configure your Paystack keys in `backend/.env`.
+Configure Paystack keys in `backend/.env`.
 
-## 📧 Email Notifications
+## Email Notifications
 
-The system sends emails for:
-- Welcome emails on registration
+Transactional emails are sent for:
+- Account registration confirmation
 - Password reset requests
-- Donation confirmations
-- Request status updates (approved/rejected/funded)
+- Contribution receipts
+- Request status updates (approved, rejected, funded)
 
 Configure SMTP settings in `backend/.env`.
 
-## 📊 Database Schema
+## Database Schema
 
-9 tables with proper relationships, foreign keys, indexes, and constraints:
-- `users` - User accounts (students, donors, admins)
-- `student_requests` - Financial assistance requests
-- `request_documents` - Supporting documents
-- `campaigns` - Fundraising campaigns
-- `donations` - Donation records
-- `payments` - Payment transaction records
-- `notifications` - User notifications
-- `password_resets` - Password reset tokens
-- `activity_logs` - System activity audit trail
-- `settings` - System configuration
+10 tables with relationships, foreign keys, indexes, and constraints:
+- `users` — Account records (students, contributors, admins)
+- `student_requests` — Financial assistance requests
+- `request_documents` — Supporting document attachments
+- `campaigns` — Fundraising campaigns
+- `donations` — Contribution records
+- `payments` — Payment transaction logs
+- `notifications` — In-app notification records
+- `password_resets` — Password reset tokens
+- `activity_logs` — Administrative action audit trail
+- `settings` — Platform configuration values
 
-## 🧪 Test Accounts
+## Test Accounts
 
 | Role | Email | Password |
 |------|-------|----------|
 | Admin | admin@campusfund.edu | password |
 | Student | john@student.edu | password |
 | Student | jane@student.edu | password |
-| Donor | donor1@email.com | password |
-| Donor | donor2@email.com | password |
+| Contributor | donor1@email.com | password |
+| Contributor | donor2@email.com | password |
 
-## 📝 License
+## Deployment
 
-This project is developed as a Final Year Project for academic purposes.
+See `DEPLOYMENT.md` for full cPanel deployment instructions.
+
+Domain: `anns.com.gracelandroyalacademy.com.ng`
+
+## License
 
 © 2024 CampusFund. All rights reserved.

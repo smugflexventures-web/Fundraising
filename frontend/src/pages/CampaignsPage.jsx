@@ -44,7 +44,7 @@ const CampaignsPage = () => {
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-gray-800 mb-3">Active Campaigns</h1>
           <p className="text-gray-500 max-w-xl mx-auto">
-            Browse active fundraising campaigns and help students achieve their educational goals
+            Verified fundraising initiatives currently accepting contributions
           </p>
         </div>
 
@@ -77,8 +77,8 @@ const CampaignsPage = () => {
         ) : campaigns.length === 0 ? (
           <div className="text-center py-16">
             <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-600">No campaigns found</h3>
-            <p className="text-sm text-gray-400">Check back later for new campaigns</p>
+            <h3 className="text-lg font-semibold text-gray-600">There are currently no active fundraising campaigns</h3>
+            <p className="text-sm text-gray-400">New campaigns may appear as they are approved</p>
           </div>
         ) : (
           <>

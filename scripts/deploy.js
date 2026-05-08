@@ -86,6 +86,8 @@ PAYSTACK_PUBLIC_KEY=pk_test_xxx
 
 UPLOAD_MAX_SIZE=5242880
 UPLOAD_PATH=uploads/
+
+CURRENCY_SYMBOL=NGN
 `;
 fs.writeFileSync(path.join(DEPLOY, 'public_html/api/.env'), envContent);
 

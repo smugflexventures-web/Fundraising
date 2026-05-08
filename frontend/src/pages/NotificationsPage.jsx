@@ -75,7 +75,7 @@ const NotificationsPage = () => {
       {loading ? <LoadingSpinner /> : notifications.length === 0 ? (
         <div className="glass rounded-2xl p-8 text-center">
           <Bell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <h3 className="text-gray-600 font-medium">No notifications</h3>
+          <h3 className="text-gray-600 font-medium">No notifications at this time</h3>
         </div>
       ) : (
         <>

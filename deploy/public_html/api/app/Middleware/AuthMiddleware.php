@@ -20,7 +20,22 @@ class AuthMiddleware
         $payload = JWT::verify($token);
 
         if (!$payload) {
-            return Response::unauthorized('Invalid or expired token');
+            return Response::unauthorized('This access token is invalid or has expired');
+        }
+
+        $userId = $payload['user_id'] ?? $payload['sub'] ?? null;
+        if ($userId) {
+            $userModel = new \App\Models\User();
+            $freshUser = $userModel->findById($userId);
+            if (!$freshUser) {
+                return Response::unauthorized('Account not found');
+            }
+            if (!$freshUser['is_active']) {
+                return Response::forbidden('This account has been deactivated');
+            }
+            $payload['role'] = $freshUser['role'];
+            $payload['is_active'] = $freshUser['is_active'];
+            $payload['is_verified'] = $freshUser['is_verified'];
         }
 
         $GLOBALS['auth_user'] = $payload;

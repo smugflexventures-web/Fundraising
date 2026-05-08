@@ -23,9 +23,9 @@ const ProfilePage = () => {
     setLoading(true);
     try {
       await updateProfile(profileData);
-      toast.success('Profile updated successfully');
+      toast.success('Profile updated');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to update profile');
+      toast.error(err.response?.data?.message || 'Profile could not be updated at this time');
     } finally {
       setLoading(false);
     }
@@ -44,10 +44,10 @@ const ProfilePage = () => {
         new_password: passwordData.new_password,
         confirm_password: passwordData.confirm_password,
       });
-      toast.success('Password changed successfully');
+      toast.success('Password updated');
       setPasswordData({ current_password: '', new_password: '', confirm_password: '' });
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to change password');
+      toast.error(err.response?.data?.message || 'Password could not be changed at this time');
     } finally {
       setLoading(false);
     }
@@ -55,7 +55,7 @@ const ProfilePage = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">My Profile</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Account Settings</h1>
 
       <div className="max-w-2xl">
         {/* Profile Header */}

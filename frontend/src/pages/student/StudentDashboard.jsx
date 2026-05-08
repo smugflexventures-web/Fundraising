@@ -10,25 +10,19 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 
 const StudentDashboard = () => {
   const { user } = useAuth();
-  const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0, funded: 0, totalRequested: 0, totalFunded: 0 });
+  const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0, funded: 0, total_requested: 0, total_funded: 0 });
   const [recentRequests, setRecentRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await api.requests.getAll({ per_page: 5 });
-        const requests = res.data.data || [];
-        setRecentRequests(requests);
-        const totalReq = res.data.pagination?.total || 0;
-        setStats({
-          total: totalReq,
-          pending: requests.filter(r => r.status === 'pending').length,
-          approved: requests.filter(r => r.status === 'approved').length,
-          funded: requests.filter(r => r.status === 'funded').length,
-          totalRequested: requests.reduce((sum, r) => sum + parseFloat(r.amount_needed || 0), 0),
-          totalFunded: requests.reduce((sum, r) => sum + parseFloat(r.amount_funded || 0), 0),
-        });
+        const [statsRes, requestsRes] = await Promise.all([
+          api.requests.getStats(),
+          api.requests.getAll({ per_page: 5 }),
+        ]);
+        setStats(statsRes.data.data || {});
+        setRecentRequests(requestsRes.data.data || []);
       } catch {} finally {
         setLoading(false);
       }
@@ -41,19 +35,19 @@ const StudentDashboard = () => {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-800">Student Dashboard</h1>
-        <p className="text-sm text-gray-500">Welcome back, {user?.first_name}</p>
+        <h1 className="text-2xl font-bold text-gray-800">Assistance Overview</h1>
+        <p className="text-sm text-gray-500">{user?.first_name}, here is your request activity</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard title="Total Requests" value={stats.total} icon={FileText} color="primary" />
-        <StatCard title="Pending" value={stats.pending} icon={Clock} color="warm" />
+        <StatCard title="Submitted Requests" value={stats.total} icon={FileText} color="primary" />
+        <StatCard title="Pending Review" value={stats.pending} icon={Clock} color="warm" />
         <StatCard title="Approved" value={stats.approved} icon={CheckCircle} color="accent" />
-        <StatCard title="Total Funded" value={formatCurrency(stats.totalFunded)} icon={DollarSign} color="purple" />
+        <StatCard title="Disbursed Funds" value={formatCurrency(stats.total_funded)} icon={DollarSign} color="purple" />
       </div>
 
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-800">Recent Requests</h2>
+        <h2 className="text-lg font-semibold text-gray-800">Recent Submissions</h2>
         <Link to="/student/requests/new" className="btn-primary text-sm flex items-center gap-2">
           <PlusCircle className="w-4 h-4" /> New Request
         </Link>
@@ -62,9 +56,9 @@ const StudentDashboard = () => {
       {recentRequests.length === 0 ? (
         <div className="glass rounded-2xl p-8 text-center">
           <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <h3 className="text-gray-600 font-medium">No requests yet</h3>
-          <p className="text-sm text-gray-400 mb-4">Submit your first assistance request</p>
-          <Link to="/student/requests/new" className="btn-primary text-sm">Create Request</Link>
+          <h3 className="text-gray-600 font-medium">No requests submitted</h3>
+          <p className="text-sm text-gray-400 mb-4">Begin by submitting an assistance request</p>
+          <Link to="/student/requests/new" className="btn-primary text-sm">Submit Request</Link>
         </div>
       ) : (
         <div className="space-y-3">

@@ -106,14 +106,14 @@ class CampaignController
         $campaignId = $this->campaignModel->create($campaignData);
 
         if (!$campaignId) {
-            return Response::error('Failed to create campaign', 500);
+            return Response::error('The campaign could not be created at this time', 500);
         }
 
         $campaign = $this->campaignModel->findById($campaignId);
 
         Helpers::logActivity($authUser['user_id'], 'create_campaign', 'Created campaign: ' . $input['title']);
 
-        return Response::success(['campaign' => $campaign], 'Campaign created successfully', 201);
+        return Response::success(['campaign' => $campaign], 'Campaign created', 201);
     }
 
     public function update($params)
@@ -137,7 +137,7 @@ class CampaignController
 
         Helpers::logActivity($authUser['user_id'], 'update_campaign', "Updated campaign {$id}");
 
-        return Response::success(['campaign' => $campaign], 'Campaign updated successfully');
+        return Response::success(['campaign' => $campaign], 'Campaign updated');
     }
 
     public function updateWithImage($params)
@@ -182,7 +182,7 @@ class CampaignController
 
         Helpers::logActivity($authUser['user_id'], 'update_campaign', "Updated campaign {$id}");
 
-        return Response::success(['campaign' => $campaign], 'Campaign updated successfully');
+        return Response::success(['campaign' => $campaign], 'Campaign updated');
     }
 
     public function destroy($params)
@@ -206,9 +206,9 @@ class CampaignController
 
         $this->campaignModel->delete($id);
 
-        Helpers::logActivity($authUser['user_id'], 'delete_campaign', "Deleted campaign {$id}");
+        Helpers::logActivity($authUser['user_id'], 'delete_campaign', "Removed campaign {$id}");
 
-        return Response::success([], 'Campaign deleted successfully');
+        return Response::success([], 'Campaign removed');
     }
 
     public function featured($params)

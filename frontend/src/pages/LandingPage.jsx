@@ -7,16 +7,23 @@ import { formatCurrency, calculateProgress } from '../utils/helpers';
 
 const LandingPage = () => {
   const [featuredCampaigns, setFeaturedCampaigns] = useState([]);
-  const [stats, setStats] = useState({ students: 0, donors: 0, donations: 0 });
+  const [stats, setStats] = useState({ students_helped: 0, donors_count: 0, donations_count: 0, total_donated: 0 });
+  const [statsLoading, setStatsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [campaignsRes] = await Promise.all([
+        const [campaignsRes, statsRes] = await Promise.all([
           api.campaigns.getFeatured(),
+          api.stats.getPublic(),
         ]);
         setFeaturedCampaigns(campaignsRes.data.data.campaigns || []);
-      } catch {}
+        if (statsRes.data.data) {
+          setStats(statsRes.data.data);
+        }
+      } catch {} finally {
+        setStatsLoading(false);
+      }
     };
     fetchData();
   }, []);
@@ -36,19 +43,18 @@ const LandingPage = () => {
           >
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
               <Heart className="w-4 h-4 text-white" />
-              <span className="text-sm text-white font-medium">Supporting Students Since 2024</span>
+              <span className="text-sm text-white font-medium">Campus Financial Assistance Portal</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
-              Empowering Students<br />
-              <span className="text-primary-200">Through Community Support</span>
+              Structured Student<br />
+              <span className="text-primary-200">Financial Support</span>
             </h1>
             <p className="text-lg sm:text-xl text-primary-100 max-w-2xl mx-auto mb-8">
-              A secure platform connecting students in need with donors who care.
-              Every contribution makes a difference in a student's educational journey.
+              A verified channel for students facing financial hardship to receive assistance from screened contributors. All disbursements are tracked and accounted for.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/register" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-primary-700 rounded-xl font-semibold hover:bg-primary-50 transition-colors shadow-lg">
-                Get Started <ArrowRight className="w-5 h-5" />
+                Create Account <ArrowRight className="w-5 h-5" />
               </Link>
               <Link to="/campaigns" className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 text-white border border-white/30 rounded-xl font-semibold hover:bg-white/20 transition-colors backdrop-blur-sm">
                 View Campaigns
@@ -63,9 +69,9 @@ const LandingPage = () => {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { icon: GraduationCap, label: 'Students Helped', value: '500+', color: 'from-primary-500 to-primary-600' },
-              { icon: Coins, label: 'Donations Made', value: '1,200+', color: 'from-accent-500 to-accent-600' },
-              { icon: BarChart3, label: 'Funds Raised', value: '₦15M+', color: 'from-purple-500 to-purple-600' },
+              { icon: GraduationCap, label: 'Students Assisted', value: statsLoading ? '...' : stats.students_helped.toLocaleString(), color: 'from-primary-500 to-primary-600' },
+              { icon: Coins, label: 'Verified Contributions', value: statsLoading ? '...' : stats.donations_count.toLocaleString(), color: 'from-accent-500 to-accent-600' },
+              { icon: BarChart3, label: 'Total Disbursed', value: statsLoading ? '...' : formatCurrency(stats.total_donated), color: 'from-purple-500 to-purple-600' },
             ].map((stat, i) => (
               <motion.div
                 key={i}
@@ -90,13 +96,13 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-800 mb-3">How It Works</h2>
-            <p className="text-gray-500 max-w-2xl mx-auto">Three simple steps to make a difference in a student's life</p>
+            <p className="text-gray-500 max-w-2xl mx-auto">A straightforward process from request to disbursement</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { step: '01', title: 'Register', desc: 'Create your account as a student or donor and get verified.', icon: Users },
-              { step: '02', title: 'Connect', desc: 'Students submit requests, donors browse campaigns and choose to help.', icon: Heart },
-              { step: '03', title: 'Transform Lives', desc: 'Donations are securely processed and directly support students in need.', icon: Shield },
+              { step: '01', title: 'Create Account', desc: 'Sign up and complete verification. Students and contributors each have dedicated access.', icon: Users },
+              { step: '02', title: 'Submit or Browse', desc: 'Students file assistance requests with documentation. Contributors review verified campaigns.', icon: Heart },
+              { step: '03', title: 'Receive or Fund', desc: 'Approved requests receive tracked disbursements. All transactions are recorded and auditable.', icon: Shield },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -124,8 +130,8 @@ const LandingPage = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <h2 className="text-3xl font-bold text-gray-800 mb-2">Featured Campaigns</h2>
-                <p className="text-gray-500">Support campaigns making the biggest impact</p>
+                <h2 className="text-3xl font-bold text-gray-800 mb-2">Active Campaigns</h2>
+                <p className="text-gray-500">Verified fundraising initiatives currently accepting contributions</p>
               </div>
               <Link to="/campaigns" className="hidden sm:inline-flex items-center gap-1 text-primary-600 font-medium hover:text-primary-700">
                 View All <ArrowRight className="w-4 h-4" />
@@ -165,14 +171,14 @@ const LandingPage = () => {
                       to={`/campaigns/${campaign.id}`}
                       className="inline-flex items-center gap-1 text-sm font-medium text-primary-600 hover:text-primary-700"
                     >
-                      Learn More <ArrowRight className="w-4 h-4" />
+                      View Details <ArrowRight className="w-4 h-4" />
                     </Link>
                   </div>
                 </motion.div>
               ))}
             </div>
             <div className="sm:hidden text-center mt-6">
-              <Link to="/campaigns" className="btn-primary">View All Campaigns</Link>
+              <Link to="/campaigns" className="btn-primary">Browse All Campaigns</Link>
             </div>
           </div>
         </section>
@@ -187,17 +193,16 @@ const LandingPage = () => {
             viewport={{ once: true }}
             className="gradient-primary rounded-3xl p-8 sm:p-12 text-center"
           >
-            <h2 className="text-3xl font-bold text-white mb-4">Ready to Make a Difference?</h2>
+            <h2 className="text-3xl font-bold text-white mb-4">Get Involved</h2>
             <p className="text-primary-100 mb-8 max-w-xl mx-auto">
-              Whether you're a student seeking assistance or a donor looking to help,
-              join our community today and be part of something meaningful.
+              Students can apply for verified financial assistance. Contributors can fund reviewed and approved requests through a transparent process.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/register" className="px-8 py-4 bg-white text-primary-700 rounded-xl font-semibold hover:bg-primary-50 transition-colors">
-                Join as Student
+                Register as Student
               </Link>
               <Link to="/register" className="px-8 py-4 bg-white/10 text-white border border-white/30 rounded-xl font-semibold hover:bg-white/20 transition-colors">
-                Join as Donor
+                Register as Contributor
               </Link>
             </div>
           </motion.div>

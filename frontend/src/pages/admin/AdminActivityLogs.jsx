@@ -36,12 +36,12 @@ const AdminActivityLogs = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Activity Logs</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Administrative Action Log</h1>
 
       {loading ? <LoadingSpinner /> : logs.length === 0 ? (
         <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
           <Activity className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <h3 className="text-gray-600 font-medium">No activity logs</h3>
+          <h3 className="text-gray-600 font-medium">No administrative actions recorded</h3>
         </div>
       ) : (
         <>

@@ -33,19 +33,19 @@ const DashboardLayout = () => {
   }, []);
 
   const studentLinks = [
-    { path: '/student', icon: LayoutDashboard, label: 'Dashboard' },
+    { path: '/student', icon: LayoutDashboard, label: 'Overview' },
     { path: '/student/requests', icon: FileText, label: 'My Requests' },
     { path: '/student/requests/new', icon: PlusCircle, label: 'New Request' },
     { path: '/student/notifications', icon: Bell, label: 'Notifications', badge: unreadCount },
-    { path: '/student/profile', icon: User, label: 'Profile' },
+    { path: '/student/profile', icon: User, label: 'Account' },
   ];
 
   const donorLinks = [
-    { path: '/donor', icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/donor/donate', icon: Heart, label: 'Donate' },
-    { path: '/donor/donations', icon: FileText, label: 'My Donations' },
+    { path: '/donor', icon: LayoutDashboard, label: 'Overview' },
+    { path: '/donor/donate', icon: Heart, label: 'Contribute' },
+    { path: '/donor/donations', icon: FileText, label: 'My Contributions' },
     { path: '/donor/notifications', icon: Bell, label: 'Notifications', badge: unreadCount },
-    { path: '/donor/profile', icon: User, label: 'Profile' },
+    { path: '/donor/profile', icon: User, label: 'Account' },
   ];
 
   const links = isStudent ? studentLinks : donorLinks;
@@ -117,7 +117,7 @@ const DashboardLayout = () => {
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t">
           <button onClick={handleLogout} className="sidebar-link text-red-600 hover:bg-red-50 w-full">
             <LogOut className="w-5 h-5" />
-            <span>Logout</span>
+            <span>Sign Out</span>
           </button>
         </div>
       </aside>

@@ -41,16 +41,16 @@ class AuthController
 
         $existingUser = $this->userModel->findByEmail($input['email']);
         if ($existingUser) {
-            return Response::error('Email already registered', 409);
+            return Response::error('This email address is already registered', 409);
         }
 
         if ($input['role'] === 'student') {
             if (empty($input['student_id'])) {
-                return Response::error('Student ID is required for student registration', 422);
+                return Response::error('Student ID is required for student accounts', 422);
             }
             $existingStudent = $this->userModel->findByStudentId($input['student_id']);
             if ($existingStudent) {
-                return Response::error('Student ID already registered', 409);
+                return Response::error('This Student ID is already registered', 409);
             }
         }
 
@@ -69,7 +69,7 @@ class AuthController
         $userId = $this->userModel->create($userData);
 
         if (!$userId) {
-            return Response::error('Registration failed', 500);
+            return Response::error('Account could not be created at this time', 500);
         }
 
         $user = $this->userModel->findById($userId);
@@ -79,7 +79,7 @@ class AuthController
             'role' => $user['role'],
         ]);
 
-        Helpers::createNotification($userId, 'Welcome to CampusFund', 'Your account has been created successfully. Welcome aboard!', 'success');
+        Helpers::createNotification($userId, 'Account Created', 'Your account has been registered and is now active.', 'success');
         Helpers::logActivity($userId, 'register', 'User registered', $_SERVER['REMOTE_ADDR'] ?? null, $_SERVER['HTTP_USER_AGENT'] ?? null);
 
         Mailer::sendWelcomeEmail($user['email'], $user['first_name']);
@@ -89,7 +89,7 @@ class AuthController
         return Response::success([
             'user' => $user,
             'token' => $token,
-        ], 'Registration successful', 201);
+        ], 'Account registered', 201);
     }
 
     public function login($params)
@@ -110,11 +110,11 @@ class AuthController
         $user = $this->userModel->verifyPassword($input['email'], $input['password']);
 
         if (!$user) {
-            return Response::error('Invalid email or password', 401);
+            return Response::error('The credentials provided could not be verified', 401);
         }
 
         if (!$user['is_active']) {
-            return Response::error('Account is deactivated. Contact administrator.', 403);
+            return Response::error('This account has been deactivated. Contact the administrator for assistance.', 403);
         }
 
         $this->userModel->updateLastLogin($user['id']);
@@ -132,7 +132,7 @@ class AuthController
         return Response::success([
             'user' => $user,
             'token' => $token,
-        ], 'Login successful');
+        ], 'Signed in');
     }
 
     public function logout($params)
@@ -141,7 +141,7 @@ class AuthController
         if ($authUser) {
             Helpers::logActivity($authUser['user_id'], 'logout', 'User logged out');
         }
-        return Response::success([], 'Logged out successfully');
+        return Response::success([], 'Signed out');
     }
 
     public function forgotPassword($params)
@@ -160,7 +160,7 @@ class AuthController
 
         $user = $this->userModel->findByEmail($input['email']);
         if (!$user) {
-            return Response::success([], 'If the email exists, a reset link has been sent');
+            return Response::success([], 'If the email is registered, a reset link has been dispatched');
         }
 
         $token = bin2hex(random_bytes(32));
@@ -195,21 +195,21 @@ class AuthController
         $reset = $passwordReset->findByToken($input['token']);
 
         if (!$reset) {
-            return Response::error('Invalid or expired reset token', 400);
+            return Response::error('This reset link is invalid or has expired', 400);
         }
 
         $user = $this->userModel->findByEmail($reset['email']);
         if (!$user) {
-            return Response::error('User not found', 404);
+            return Response::error('No account found with this email', 404);
         }
 
         $this->userModel->updatePassword($user['id'], $input['password']);
         $passwordReset->deleteByEmail($reset['email']);
 
         Helpers::logActivity($user['id'], 'reset_password', 'Password reset successful');
-        Helpers::createNotification($user['id'], 'Password Updated', 'Your password has been reset successfully.', 'success');
+        Helpers::createNotification($user['id'], 'Password Updated', 'Your account password has been changed.', 'success');
 
-        return Response::success([], 'Password reset successful');
+        return Response::success([], 'Password has been updated');
     }
 
     public function me($params)
@@ -248,7 +248,7 @@ class AuthController
 
         Helpers::logActivity($authUser['user_id'], 'update_profile', 'Profile updated');
 
-        return Response::success(['user' => $user], 'Profile updated successfully');
+        return Response::success(['user' => $user], 'Profile updated');
     }
 
     public function changePassword($params)
@@ -269,12 +269,12 @@ class AuthController
 
         $user = $this->userModel->findByEmail($authUser['email']);
         if (!password_verify($input['current_password'], $user['password'])) {
-            return Response::error('Current password is incorrect', 400);
+            return Response::error('The current password you entered is incorrect', 400);
         }
 
         $this->userModel->updatePassword($authUser['user_id'], $input['new_password']);
         Helpers::logActivity($authUser['user_id'], 'change_password', 'Password changed');
 
-        return Response::success([], 'Password changed successfully');
+        return Response::success([], 'Password has been changed');
     }
 }

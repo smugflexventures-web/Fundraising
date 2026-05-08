@@ -45,28 +45,28 @@ const AdminDashboard = () => {
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
-        <p className="text-sm text-gray-500">System overview and analytics</p>
+        <h1 className="text-2xl font-bold text-gray-800">Operations Overview</h1>
+        <p className="text-sm text-gray-500">Platform activity and financial summary</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard title="Total Students" value={stats.users?.total_students || 0} icon={Users} color="primary" />
-        <StatCard title="Total Donors" value={stats.users?.total_donors || 0} icon={Users} color="accent" />
-        <StatCard title="Total Donations" value={formatCurrency(stats.donations?.total_amount)} icon={DollarSign} color="purple" />
-        <StatCard title="Pending Requests" value={stats.requests?.pending || 0} icon={Clock} color="warm" />
+        <StatCard title="Registered Students" value={stats.users?.total_students || 0} icon={Users} color="primary" />
+        <StatCard title="Registered Contributors" value={stats.users?.total_donors || 0} icon={Users} color="accent" />
+        <StatCard title="Verified Contributions" value={formatCurrency(stats.donations?.total_amount)} icon={DollarSign} color="purple" />
+        <StatCard title="Pending Review" value={stats.requests?.pending || 0} icon={Clock} color="warm" />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard title="Approved Requests" value={stats.requests?.approved || 0} icon={CheckCircle} color="accent" />
         <StatCard title="Funded Requests" value={stats.requests?.funded || 0} icon={FileText} color="info" />
         <StatCard title="Active Campaigns" value={stats.campaigns?.active || 0} icon={Target} color="primary" />
-        <StatCard title="Total Raised" value={formatCurrency(stats.campaigns?.total_raised)} icon={TrendingUp} color="purple" />
+        <StatCard title="Campaign Revenue" value={formatCurrency(stats.campaigns?.total_raised)} icon={TrendingUp} color="purple" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Monthly Donations Chart */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Monthly Donations</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Monthly Contribution Volume</h3>
           {monthlyData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <AreaChart data={monthlyData}>
@@ -78,7 +78,7 @@ const AdminDashboard = () => {
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-[300px] flex items-center justify-center text-gray-400">No donation data yet</div>
+            <div className="h-[300px] flex items-center justify-center text-gray-400">Contribution data will appear here</div>
           )}
         </div>
 
@@ -97,20 +97,20 @@ const AdminDashboard = () => {
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-[300px] flex items-center justify-center text-gray-400">No request data yet</div>
+            <div className="h-[300px] flex items-center justify-center text-gray-400">Request data will appear here</div>
           )}
         </div>
       </div>
 
       {/* Recent Donations */}
       <div className="bg-white rounded-2xl p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Donations</h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Transactions</h3>
         {(stats.recent_donations || []).length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left px-3 py-2 text-xs font-medium text-gray-500">Donor</th>
+                  <th className="text-left px-3 py-2 text-xs font-medium text-gray-500">Contributor</th>
                   <th className="text-left px-3 py-2 text-xs font-medium text-gray-500">Amount</th>
                   <th className="text-left px-3 py-2 text-xs font-medium text-gray-500">Date</th>
                   <th className="text-left px-3 py-2 text-xs font-medium text-gray-500">Status</th>
@@ -137,7 +137,7 @@ const AdminDashboard = () => {
             </table>
           </div>
         ) : (
-          <p className="text-gray-400 text-sm text-center py-4">No recent donations</p>
+          <p className="text-gray-400 text-sm text-center py-4">No transactions recorded yet</p>
         )}
       </div>
     </div>

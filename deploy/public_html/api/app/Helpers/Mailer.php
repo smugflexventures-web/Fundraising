@@ -56,7 +56,7 @@ class Mailer
     public static function sendWelcomeEmail($to, $name)
     {
         $mailer = new self();
-        $subject = 'Welcome to CampusFund';
+        $subject = 'Account Registration Confirmed';
         $body = self::getEmailTemplate('welcome', [
             'name' => $name,
             'app_name' => Config::get('APP_NAME', 'CampusFund'),
@@ -67,7 +67,7 @@ class Mailer
     public static function sendPasswordResetEmail($to, $name, $resetLink)
     {
         $mailer = new self();
-        $subject = 'Password Reset Request - CampusFund';
+        $subject = 'Password Reset - CampusFund';
         $body = self::getEmailTemplate('password_reset', [
             'name' => $name,
             'reset_link' => $resetLink,
@@ -79,8 +79,8 @@ class Mailer
     public static function sendDonationConfirmation($to, $name, $amount, $campaign)
     {
         $mailer = new self();
-        $currency = Config::get('CURRENCY_SYMBOL', '₦');
-        $subject = 'Donation Confirmation - CampusFund';
+        $currency = Config::get('CURRENCY_SYMBOL', 'NGN');
+        $subject = 'Contribution Confirmation - CampusFund';
         $body = self::getEmailTemplate('donation_confirmation', [
             'name' => $name,
             'amount' => $currency . number_format($amount, 2),
@@ -93,7 +93,7 @@ class Mailer
     public static function sendRequestStatusEmail($to, $name, $status, $requestTitle)
     {
         $mailer = new self();
-        $subject = "Request {$status} - CampusFund";
+        $subject = "Assistance Request {$status} - CampusFund";
         $body = self::getEmailTemplate('request_status', [
             'name' => $name,
             'status' => $status,
@@ -127,30 +127,29 @@ class Mailer
 
         switch ($type) {
             case 'welcome':
-                $content = "<h2 style='color:#1e293b;'>Welcome, {$name}!</h2>
-                    <p style='color:#475569;line-height:1.6;'>Thank you for joining {$appName}. Your account has been created successfully.</p>
-                    <p style='color:#475569;line-height:1.6;'>You can now log in and start using the platform to make a difference in students' lives.</p>
-                    <a href='" . Config::get('APP_URL', 'http://localhost:5173') . "' style='display:inline-block;padding:12px 24px;background:#3b82f6;color:#fff;text-decoration:none;border-radius:8px;margin-top:16px;'>Get Started</a>";
+                $content = "<h2 style='color:#1e293b;'>Account Registration Confirmed</h2>
+                    <p style='color:#475569;line-height:1.6;'>{$name}, your {$appName} account has been created. You may now sign in and access the platform.</p>
+                    <a href='" . Config::get('APP_URL', 'http://localhost:5173') . "' style='display:inline-block;padding:12px 24px;background:#3b82f6;color:#fff;text-decoration:none;border-radius:8px;margin-top:16px;'>Sign In</a>";
                 break;
 
             case 'password_reset':
                 $resetLink = $data['reset_link'] ?? '#';
-                $content = "<h2 style='color:#1e293b;'>Hello, {$name}</h2>
-                    <p style='color:#475569;line-height:1.6;'>We received a request to reset your password. Click the button below to reset it:</p>
+                $content = "<h2 style='color:#1e293b;'>Password Reset</h2>
+                    <p style='color:#475569;line-height:1.6;'>A password reset was requested for your account. Use the link below to set a new password.</p>
                     <a href='{$resetLink}' style='display:inline-block;padding:12px 24px;background:#3b82f6;color:#fff;text-decoration:none;border-radius:8px;margin-top:16px;'>Reset Password</a>
-                    <p style='color:#94a3b8;font-size:13px;margin-top:16px;'>This link expires in 1 hour. If you didn't request this, ignore this email.</p>";
+                    <p style='color:#94a3b8;font-size:13px;margin-top:16px;'>This link expires in 1 hour. If you did not initiate this request, no further action is required.</p>";
                 break;
 
             case 'donation_confirmation':
                 $amount = $data['amount'] ?? '0.00';
                 $campaign = $data['campaign'] ?? 'General Fund';
-                $content = "<h2 style='color:#1e293b;'>Thank You, {$name}!</h2>
-                    <p style='color:#475569;line-height:1.6;'>Your donation has been processed successfully.</p>
+                $content = "<h2 style='color:#1e293b;'>Contribution Processed</h2>
+                    <p style='color:#475569;line-height:1.6;'>Your contribution has been processed and recorded.</p>
                     <div style='background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px;margin:16px 0;'>
                         <p style='margin:0;color:#166534;font-size:18px;font-weight:bold;'>{$amount}</p>
-                        <p style='margin:4px 0 0;color:#15803d;'>to {$campaign}</p>
+                        <p style='margin:4px 0 0;color:#15803d;'>allocated to {$campaign}</p>
                     </div>
-                    <p style='color:#475569;line-height:1.6;'>Your generosity makes a real difference. Thank you for supporting students in need.</p>";
+                    <p style='color:#475569;line-height:1.6;'>A record of this transaction has been added to your contribution history.</p>";
                 break;
 
             case 'request_status':
@@ -162,8 +161,8 @@ class Mailer
                     'Funded' => '#1e40af',
                 ];
                 $color = $statusColors[$status] ?? '#475569';
-                $content = "<h2 style='color:#1e293b;'>Hello, {$name}</h2>
-                    <p style='color:#475569;line-height:1.6;'>Your request has been updated:</p>
+                $content = "<h2 style='color:#1e293b;'>Assistance Request Update</h2>
+                    <p style='color:#475569;line-height:1.6;'>The status of your assistance request has been updated:</p>
                     <div style='background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin:16px 0;'>
                         <p style='margin:0;color:#64748b;font-size:14px;'>Request: <strong>{$requestTitle}</strong></p>
                         <p style='margin:4px 0 0;color:{$color};font-weight:bold;font-size:16px;'>Status: {$status}</p>

@@ -12,10 +12,10 @@ use App\Core\Response;
 
 class AdminController
 {
-    private $userModel;
-    private $requestModel;
-    private $campaignModel;
-    private $donationModel;
+    private User $userModel;
+    private StudentRequest $requestModel;
+    private Campaign $campaignModel;
+    private Donation $donationModel;
 
     public function __construct()
     {
@@ -23,6 +23,26 @@ class AdminController
         $this->requestModel = new StudentRequest();
         $this->campaignModel = new Campaign();
         $this->donationModel = new Donation();
+    }
+
+    public function publicStats($params)
+    {
+        $totalStudents = $this->userModel->countByRole('student');
+        $totalDonors = $this->userModel->countByRole('donor');
+        $totalDonations = $this->donationModel->getTotalDonations();
+        $totalDonationCount = $this->donationModel->countByStatus('completed');
+        $totalFunded = $this->requestModel->getTotalFunded();
+        $fundedRequests = $this->requestModel->countByStatus('funded');
+        $activeCampaigns = $this->campaignModel->countByStatus('active');
+
+        return Response::success([
+            'students_helped' => $fundedRequests,
+            'donors_count' => $totalDonors,
+            'donations_count' => $totalDonationCount,
+            'total_donated' => (float)$totalDonations,
+            'total_funded' => (float)$totalFunded,
+            'active_campaigns' => $activeCampaigns,
+        ]);
     }
 
     public function stats($params)
@@ -86,67 +106,67 @@ class AdminController
         return Response::paginated($result['data'], $result['total'], $page, $perPage);
     }
 
-    public function verifyUser($params)
+    public function verifyUser(array $params)
     {
         $id = $params['id'] ?? null;
         $authUser = $GLOBALS['auth_user'] ?? null;
 
         if (!$id) {
-            return Response::error('User ID is required', 400);
+            return Response::error('Account ID is required', 400);
         }
 
         $user = $this->userModel->findById($id);
         if (!$user) {
-            return Response::notFound('User not found');
+            return Response::notFound('Account not found');
         }
 
         $this->userModel->verifyEmail($id);
 
-        Helpers::createNotification($id, 'Account Verified', 'Your account has been verified by the administrator.', 'success');
-        Helpers::logActivity($authUser['user_id'], 'verify_user', "Verified user {$id}");
+        Helpers::createNotification($id, 'Account Verified', 'Your account has been verified by an administrator.', 'success');
+        Helpers::logActivity($authUser['user_id'], 'verify_user', "Verified account {$id}");
 
-        return Response::success([], 'User verified successfully');
+        return Response::success([], 'Account verification confirmed');
     }
 
-    public function toggleUserStatus($params)
+    public function toggleUserStatus(array $params)
     {
         $id = $params['id'] ?? null;
         $authUser = $GLOBALS['auth_user'] ?? null;
 
         if (!$id) {
-            return Response::error('User ID is required', 400);
+            return Response::error('Account ID is required', 400);
         }
 
         $user = $this->userModel->findById($id);
         if (!$user) {
-            return Response::notFound('User not found');
+            return Response::notFound('Account not found');
         }
 
         $newStatus = !$user['is_active'];
         $this->userModel->update($id, ['is_active' => $newStatus]);
 
-        Helpers::logActivity($authUser['user_id'], 'toggle_user_status', "User {$id} status changed to " . ($newStatus ? 'active' : 'inactive'));
+        Helpers::logActivity($authUser['user_id'], 'toggle_user_status', "Account {$id} status changed to " . ($newStatus ? 'active' : 'inactive'));
 
-        return Response::success([], 'User status updated successfully');
+        return Response::success([], 'Account status updated');
     }
 
-    public function deleteUser($params)
+    public function deleteUser(array $params)
     {
         $id = $params['id'] ?? null;
         $authUser = $GLOBALS['auth_user'] ?? null;
 
         if (!$id) {
-            return Response::error('User ID is required', 400);
+            return Response::error('Account ID is required', 400);
         }
 
         if ($id == $authUser['user_id']) {
-            return Response::error('Cannot delete your own account', 400);
+            return Response::error('You cannot remove your own account', 400);
         }
 
         $this->userModel->delete($id);
-        Helpers::logActivity($authUser['user_id'], 'delete_user', "Deleted user {$id}");
+        Helpers::logActivity($authUser['user_id'], 'delete_user', "Removed account {$id}");
 
-        return Response::success([], 'User deleted successfully');
+        return Response::success([], 'Account removed');
     }
 
     public function activityLogs($params)
@@ -180,7 +200,7 @@ class AdminController
                 $data = $this->getCampaignsReport();
                 break;
             default:
-                return Response::error('Invalid report type', 400);
+                return Response::error('Unsupported report type', 400);
         }
 
         if ($format === 'csv') {
@@ -190,7 +210,7 @@ class AdminController
         return Response::success(['report' => $data]);
     }
 
-    private function getDonationsReport($startDate, $endDate)
+    private function getDonationsReport(?string $startDate, ?string $endDate)
     {
         $where = ["d.status = 'completed'"];
         $params = [];
@@ -220,7 +240,7 @@ class AdminController
         );
     }
 
-    private function getStudentsReport($startDate, $endDate)
+    private function getStudentsReport(?string $startDate, ?string $endDate)
     {
         $where = [];
         $params = [];
@@ -261,10 +281,51 @@ class AdminController
         );
     }
 
-    private function exportCsv($data, $type)
+    public function getSettings($params)
+    {
+        $db = \App\Core\Database::getInstance();
+        $settings = $db->fetchAll("SELECT setting_key, setting_value FROM settings");
+        $settingsMap = [];
+        foreach ($settings as $row) {
+            $settingsMap[$row['setting_key']] = $row['setting_value'];
+        }
+        return Response::success(['settings' => $settingsMap]);
+    }
+
+    public function updateSettings($params)
+    {
+        $authUser = $GLOBALS['auth_user'] ?? null;
+        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $input = Helpers::sanitize($input);
+
+        $allowedKeys = [
+            'site_name', 'site_description', 'currency', 'currency_symbol',
+            'min_donation_amount', 'max_donation_amount',
+            'enable_registration', 'enable_email_verification', 'maintenance_mode',
+        ];
+
+        $db = \App\Core\Database::getInstance();
+
+        foreach ($allowedKeys as $key) {
+            if (array_key_exists($key, $input)) {
+                $existing = $db->fetch("SELECT id FROM settings WHERE setting_key = ?", [$key]);
+                if ($existing) {
+                    $db->update("UPDATE settings SET setting_value = ? WHERE setting_key = ?", [$input[$key], $key]);
+                } else {
+                    $db->insert("INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)", [$key, $input[$key]]);
+                }
+            }
+        }
+
+        Helpers::logActivity($authUser['user_id'], 'update_settings', 'Platform configuration updated');
+
+        return Response::success([], 'Configuration updated');
+    }
+
+    private function exportCsv(array $data, string $type)
     {
         if (empty($data)) {
-            return Response::error('No data to export', 404);
+            return Response::error('No data available for export', 404);
         }
 
         $filename = $type . '_report_' . date('Y-m-d') . '.csv';

@@ -77,18 +77,18 @@ const AdminCampaigns = () => {
       setShowModal(false);
       fetchCampaigns();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to save campaign');
+      toast.error(err.response?.data?.message || 'Campaign could not be saved at this time');
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this campaign?')) return;
+    if (!window.confirm('This campaign will be permanently removed. Continue?')) return;
     try {
       await api.campaigns.delete(id);
-      toast.success('Campaign deleted');
+      toast.success('Campaign removed');
       fetchCampaigns();
     } catch {
-      toast.error('Failed to delete campaign');
+      toast.error('Campaign could not be removed at this time');
     }
   };
 
@@ -98,9 +98,9 @@ const AdminCampaigns = () => {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Campaign Management</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Campaign Administration</h1>
         <button onClick={openCreateModal} className="btn-primary text-sm flex items-center gap-2">
-          <PlusCircle className="w-4 h-4" /> New Campaign
+          <PlusCircle className="w-4 h-4" /> Create Campaign
         </button>
       </div>
 

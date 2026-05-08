@@ -45,7 +45,7 @@ const NewRequestPage = () => {
         f.size <= 5 * 1024 * 1024
     );
     if (validFiles.length !== selected.length) {
-      toast.warning('Some files were skipped (invalid type or exceed 5MB)');
+      toast.warning('Some files were excluded due to unsupported format or size exceeding 5MB');
     }
     setFiles([...files, ...validFiles]);
   };
@@ -71,14 +71,14 @@ const NewRequestPage = () => {
       });
 
       const res = await api.requests.create(data);
-      toast.success('Request submitted successfully');
+      toast.success('Assistance request submitted');
       navigate(`/student/requests/${res.data.data.request.id}`);
     } catch (err) {
       const errors = err.response?.data?.errors;
       if (errors) {
         Object.values(errors).flat().forEach((msg) => toast.error(msg));
       } else {
-        toast.error(err.response?.data?.message || 'Failed to submit request');
+        toast.error(err.response?.data?.message || 'The request could not be submitted at this time');
       }
     } finally {
       setLoading(false);
@@ -98,7 +98,7 @@ const NewRequestPage = () => {
               value={formData.title}
               onChange={handleChange}
               className="input-field"
-              placeholder="Brief title for your request"
+              placeholder="Brief title describing your need"
               required
             />
           </div>
@@ -110,7 +110,7 @@ const NewRequestPage = () => {
               value={formData.description}
               onChange={handleChange}
               className="input-field min-h-[120px]"
-              placeholder="Describe your situation and why you need assistance (minimum 20 characters)"
+              placeholder="Describe your circumstances and the assistance required (minimum 20 characters)"
               required
             />
           </div>

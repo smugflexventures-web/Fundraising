@@ -17,9 +17,9 @@ const ForgotPasswordPage = () => {
     try {
       await forgotPassword(email);
       setSent(true);
-      toast.success('Reset link sent if email exists');
+      toast.success('If the email is registered, a reset link has been sent');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to send reset email');
+      toast.error(err.response?.data?.message || 'The request could not be completed at this time');
     } finally {
       setLoading(false);
     }
@@ -33,8 +33,8 @@ const ForgotPasswordPage = () => {
             <div className="w-14 h-14 gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Heart className="w-7 h-7 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-800">Forgot Password</h1>
-            <p className="text-sm text-gray-500 mt-1">Enter your email to receive a reset link</p>
+            <h1 className="text-2xl font-bold text-gray-800">Reset Password</h1>
+            <p className="text-sm text-gray-500 mt-1">Enter the email associated with your account</p>
           </div>
 
           {sent ? (
@@ -42,8 +42,8 @@ const ForgotPasswordPage = () => {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Mail className="w-8 h-8 text-green-600" />
               </div>
-              <p className="text-sm text-gray-600">If an account exists with that email, a reset link has been sent.</p>
-              <Link to="/login" className="btn-primary inline-block mt-4">Back to Login</Link>
+              <p className="text-sm text-gray-600">If an account is registered with this email, a password reset link has been dispatched.</p>
+              <Link to="/login" className="btn-primary inline-block mt-4">Return to Sign In</Link>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -68,7 +68,7 @@ const ForgotPasswordPage = () => {
           )}
 
           <Link to="/login" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-primary-600 mt-6">
-            <ArrowLeft className="w-4 h-4" /> Back to Login
+            <ArrowLeft className="w-4 h-4" /> Return to Sign In
           </Link>
         </div>
       </motion.div>

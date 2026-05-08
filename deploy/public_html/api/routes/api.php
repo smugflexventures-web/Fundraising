@@ -7,10 +7,11 @@ $router = new Router();
 // ============================================
 // Public Routes
 // ============================================
-$router->post('/auth/register', 'AuthController@register');
-$router->post('/auth/login', 'AuthController@login');
-$router->post('/auth/forgot-password', 'AuthController@forgotPassword');
+$router->post('/auth/register', 'AuthController@register', ['RateLimitMiddleware']);
+$router->post('/auth/login', 'AuthController@login', ['RateLimitMiddleware']);
+$router->post('/auth/forgot-password', 'AuthController@forgotPassword', ['RateLimitMiddleware']);
 $router->post('/auth/reset-password', 'AuthController@resetPassword');
+$router->get('/stats/public', 'AdminController@publicStats');
 
 // ============================================
 // Protected Routes (Auth Required)
@@ -35,6 +36,7 @@ $router->delete('/campaigns/{id}', 'CampaignController@destroy', ['AuthMiddlewar
 // Student Request Routes
 // ============================================
 $router->get('/requests', 'StudentRequestController@index', ['AuthMiddleware']);
+$router->get('/requests/stats', 'StudentRequestController@studentStats', ['AuthMiddleware']);
 $router->get('/requests/{id}', 'StudentRequestController@show', ['AuthMiddleware']);
 $router->post('/requests', 'StudentRequestController@store', ['AuthMiddleware']);
 $router->put('/requests/{id}', 'StudentRequestController@update', ['AuthMiddleware']);
@@ -46,6 +48,7 @@ $router->post('/requests/{id}/documents', 'StudentRequestController@uploadDocume
 // Donation Routes
 // ============================================
 $router->get('/donations', 'DonationController@index', ['AuthMiddleware']);
+$router->get('/donations/stats', 'DonationController@donorStats', ['AuthMiddleware']);
 $router->get('/donations/{id}', 'DonationController@show', ['AuthMiddleware']);
 $router->post('/donations/initialize', 'DonationController@initialize', ['AuthMiddleware']);
 $router->post('/donations/verify', 'DonationController@verify', ['AuthMiddleware']);
@@ -70,5 +73,7 @@ $router->put('/admin/users/{id}/toggle-status', 'AdminController@toggleUserStatu
 $router->delete('/admin/users/{id}', 'AdminController@deleteUser', ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/admin/activity-logs', 'AdminController@activityLogs', ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/admin/reports', 'AdminController@reports', ['AuthMiddleware', 'AdminMiddleware']);
+$router->get('/admin/settings', 'AdminController@getSettings', ['AuthMiddleware', 'AdminMiddleware']);
+$router->put('/admin/settings', 'AdminController@updateSettings', ['AuthMiddleware', 'AdminMiddleware']);
 
 return $router;

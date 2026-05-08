@@ -61,7 +61,7 @@ const MainLayout = () => {
                     Dashboard
                   </Link>
                   <button onClick={logout} className="text-sm text-gray-600 hover:text-red-600 transition-colors">
-                    Logout
+                    Sign Out
                   </button>
                 </>
               ) : (
@@ -111,7 +111,7 @@ const MainLayout = () => {
                       Dashboard
                     </Link>
                     <button onClick={() => { logout(); setMobileOpen(false); }} className="block w-full text-sm text-red-600 py-2">
-                      Logout
+                      Sign Out
                     </button>
                   </>
                 ) : (
@@ -147,14 +147,13 @@ const MainLayout = () => {
                 <span className="text-xl font-bold text-white">CampusFund</span>
               </div>
               <p className="text-sm text-gray-400 max-w-md">
-                A secure campus fundraising and donation management system designed to provide
-                financial and emergency assistance to students in need.
+                A structured financial assistance and emergency support channel for students within the campus community.
               </p>
             </div>
             <div>
               <h4 className="text-white font-semibold mb-3">Quick Links</h4>
               <div className="space-y-2">
-                <Link to="/about" className="block text-sm text-gray-400 hover:text-white transition-colors">About Us</Link>
+                <Link to="/about" className="block text-sm text-gray-400 hover:text-white transition-colors">About</Link>
                 <Link to="/campaigns" className="block text-sm text-gray-400 hover:text-white transition-colors">Campaigns</Link>
                 <Link to="/register" className="block text-sm text-gray-400 hover:text-white transition-colors">Register</Link>
               </div>

@@ -28,12 +28,12 @@ const DonorDonations = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Donation History</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Contribution History</h1>
 
       {loading ? <LoadingSpinner /> : donations.length === 0 ? (
         <div className="glass rounded-2xl p-8 text-center">
           <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <h3 className="text-gray-600 font-medium">No donations yet</h3>
+          <h3 className="text-gray-600 font-medium">No contributions on record</h3>
         </div>
       ) : (
         <>

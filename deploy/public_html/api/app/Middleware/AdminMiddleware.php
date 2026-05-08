@@ -11,11 +11,15 @@ class AdminMiddleware
         $user = $GLOBALS['auth_user'] ?? null;
 
         if (!$user) {
-            return Response::unauthorized('Authentication required');
+            return Response::unauthorized('Authentication is required');
         }
 
         if (($user['role'] ?? '') !== 'admin') {
-            return Response::forbidden('Admin access required');
+            return Response::forbidden('Administrator access is required');
+        }
+
+        if (isset($user['is_active']) && !$user['is_active']) {
+            return Response::forbidden('This account has been deactivated');
         }
 
         return null;

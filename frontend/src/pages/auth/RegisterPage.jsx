@@ -38,7 +38,7 @@ const RegisterPage = () => {
     setLoading(true);
     try {
       const res = await register(formData);
-      toast.success('Registration successful!');
+      toast.success('Account created successfully');
       const role = res.data.user.role;
       navigate(role === 'admin' ? '/admin' : role === 'student' ? '/student' : '/donor');
     } catch (err) {
@@ -66,7 +66,7 @@ const RegisterPage = () => {
               <Heart className="w-7 h-7 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-gray-800">Create Account</h1>
-            <p className="text-sm text-gray-500 mt-1">Join CampusFund and make a difference</p>
+            <p className="text-sm text-gray-500 mt-1">Register to submit or fund assistance requests</p>
           </div>
 
           {/* Role Selection */}
@@ -82,7 +82,7 @@ const RegisterPage = () => {
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
               >
-                {role === 'student' ? '🎓 Student' : '🤝 Donor'}
+                {role === 'student' ? 'Student' : 'Contributor'}
               </button>
             ))}
           </div>

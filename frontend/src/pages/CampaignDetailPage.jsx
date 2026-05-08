@@ -31,7 +31,7 @@ const CampaignDetailPage = () => {
   };
 
   if (loading) return <LoadingSpinner />;
-  if (!campaign) return <div className="text-center py-20"><h2>Campaign not found</h2></div>;
+  if (!campaign) return <div className="text-center py-20"><h2>This campaign could not be found</h2></div>;
 
   const progress = calculateProgress(campaign.raised_amount, campaign.target_amount);
 
@@ -78,7 +78,7 @@ const CampaignDetailPage = () => {
               {/* Recent Donations */}
               {campaign.donations && campaign.donations.length > 0 && (
                 <div className="mt-8">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Donations</h3>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Recent Contributions</h3>
                   <div className="space-y-3">
                     {campaign.donations.slice(0, 5).map((donation) => (
                       <div key={donation.id} className="flex items-center gap-3 bg-gray-50 rounded-xl p-3">
@@ -126,7 +126,7 @@ const CampaignDetailPage = () => {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-600">
                   <Users className="w-4 h-4 text-gray-400" />
-                  <span>{campaign.donors_count || 0} donors</span>
+                  <span>{campaign.donors_count || 0} contributors</span>
                 </div>
                 {campaign.end_date && (
                   <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -137,7 +137,7 @@ const CampaignDetailPage = () => {
               </div>
 
               <button onClick={handleDonate} className="btn-primary w-full flex items-center justify-center gap-2">
-                <Heart className="w-5 h-5" /> Donate Now
+                <Heart className="w-5 h-5" /> Contribute
               </button>
             </div>
           </div>

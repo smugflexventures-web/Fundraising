@@ -36,14 +36,14 @@ const AdminLayout = () => {
   }, []);
 
   const links = [
-    { path: '/admin', icon: LayoutDashboard, label: 'Dashboard', exact: true },
-    { path: '/admin/users', icon: Users, label: 'Users' },
+    { path: '/admin', icon: LayoutDashboard, label: 'Overview', exact: true },
+    { path: '/admin/users', icon: Users, label: 'Accounts' },
     { path: '/admin/requests', icon: FileText, label: 'Requests' },
     { path: '/admin/campaigns', icon: Target, label: 'Campaigns' },
-    { path: '/admin/donations', icon: DollarSign, label: 'Donations' },
+    { path: '/admin/donations', icon: DollarSign, label: 'Contributions' },
     { path: '/admin/reports', icon: BarChart3, label: 'Reports' },
-    { path: '/admin/activity-logs', icon: Activity, label: 'Activity Logs' },
-    { path: '/admin/settings', icon: Settings, label: 'Settings' },
+    { path: '/admin/activity-logs', icon: Activity, label: 'Action Log' },
+    { path: '/admin/settings', icon: Settings, label: 'Configuration' },
   ];
 
   const isActive = (path, exact) => {
@@ -117,7 +117,7 @@ const AdminLayout = () => {
         <div className="absolute bottom-0 left-0 right-0 p-4">
           <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 w-full transition-all">
             <LogOut className="w-5 h-5" />
-            <span>Logout</span>
+            <span>Sign Out</span>
           </button>
         </div>
       </aside>

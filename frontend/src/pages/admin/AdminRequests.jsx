@@ -37,12 +37,12 @@ const AdminRequests = () => {
   const handleStatusUpdate = async (id, status) => {
     try {
       await api.requests.updateStatus(id, { status, notes: adminNotes });
-      toast.success(`Request ${status}`);
+      toast.success(`Request ${status} successfully`);
       setShowModal(false);
       setAdminNotes('');
       fetchRequests();
     } catch {
-      toast.error('Failed to update request status');
+      toast.error('Status update could not be completed at this time');
     }
   };
 
@@ -54,7 +54,7 @@ const AdminRequests = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Request Management</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Assistance Request Review</h1>
 
       <div className="flex gap-2 mb-6 overflow-x-auto">
         {['', 'pending', 'approved', 'rejected', 'funded'].map((status) => (
@@ -150,7 +150,7 @@ const AdminRequests = () => {
                 value={adminNotes}
                 onChange={(e) => setAdminNotes(e.target.value)}
                 className="input-field min-h-[80px]"
-                placeholder="Add notes about this decision..."
+                placeholder="Administrative notes for this decision..."
               />
             </div>
 

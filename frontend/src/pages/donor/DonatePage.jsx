@@ -38,7 +38,7 @@ const DonatePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.amount || parseFloat(formData.amount) < 1000) {
-      toast.error('Minimum donation amount is ₦1,000');
+      toast.error('Minimum contribution amount is NGN 1,000');
       return;
     }
 
@@ -63,15 +63,15 @@ const DonatePage = () => {
           amount: parseFloat(formData.amount) * 100,
           ref: reference,
           onClose: () => {
-            toast.warning('Payment window closed');
+            toast.warning('Payment window was closed before completion');
           },
           callback: async (response) => {
             try {
               await api.donations.verify(response.reference);
-              toast.success('Donation successful! Thank you for your generosity.');
+              toast.success('Contribution processed successfully');
               navigate('/donor/donations');
             } catch {
-              toast.error('Payment verification failed');
+              toast.error('Payment verification could not be completed');
             }
           },
         });
@@ -81,7 +81,7 @@ const DonatePage = () => {
         window.location.href = authorization_url;
       }
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Failed to initialize payment');
+      toast.error(err.response?.data?.message || 'Payment could not be initialized at this time');
     } finally {
       setLoading(false);
     }
@@ -91,7 +91,7 @@ const DonatePage = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Make a Donation</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Make a Contribution</h1>
 
       <div className="max-w-2xl">
         {fetchingCampaign && <Loader2 className="w-6 h-6 animate-spin text-primary-600" />}

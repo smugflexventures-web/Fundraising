@@ -27,14 +27,14 @@ const AdminReports = () => {
         a.download = `${reportType}_report_${new Date().toISOString().split('T')[0]}.csv`;
         a.click();
         window.URL.revokeObjectURL(url);
-        toast.success('CSV downloaded');
+        toast.success('Report exported');
       } else {
         const res = await api.admin.getReports(params);
         setReportData(res.data.data.report);
-        toast.success('Report generated');
+        toast.success('Report data loaded');
       }
     } catch {
-      toast.error('Failed to generate report');
+      toast.error('Report could not be generated at this time');
     } finally {
       setLoading(false);
     }
@@ -42,7 +42,7 @@ const AdminReports = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Reports</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Financial Reports</h1>
 
       <div className="bg-white rounded-2xl p-6 shadow-sm mb-6">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Generate Report</h3>
@@ -84,7 +84,7 @@ const AdminReports = () => {
       {reportData && format === 'json' && (
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
-            {reportType === 'donations' ? 'Donations' : reportType === 'students' ? 'Student Requests' : 'Campaigns'} Report
+            {reportType === 'donations' ? 'Contribution' : reportType === 'students' ? 'Assistance Request' : 'Campaign'} Report
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

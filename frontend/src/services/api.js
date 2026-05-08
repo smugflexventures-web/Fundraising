@@ -34,6 +34,7 @@ const api = {
   // Student Requests
   requests: {
     getAll: (params) => axios.get(`${API_URL}/requests`, { params, headers: getAuthHeaders() }),
+    getStats: () => axios.get(`${API_URL}/requests/stats`, { headers: getAuthHeaders() }),
     getById: (id) => axios.get(`${API_URL}/requests/${id}`, { headers: getAuthHeaders() }),
     create: (formData) => axios.post(`${API_URL}/requests`, formData, { headers: { ...getAuthHeaders(), 'Content-Type': 'multipart/form-data' } }),
     update: (id, data) => axios.put(`${API_URL}/requests/${id}`, data, { headers: getAuthHeaders() }),
@@ -45,6 +46,7 @@ const api = {
   // Donations
   donations: {
     getAll: (params) => axios.get(`${API_URL}/donations`, { params, headers: getAuthHeaders() }),
+    getStats: () => axios.get(`${API_URL}/donations/stats`, { headers: getAuthHeaders() }),
     getById: (id) => axios.get(`${API_URL}/donations/${id}`, { headers: getAuthHeaders() }),
     initialize: (data) => axios.post(`${API_URL}/donations/initialize`, data, { headers: getAuthHeaders() }),
     verify: (reference) => axios.post(`${API_URL}/donations/verify`, { reference }, { headers: getAuthHeaders() }),
@@ -60,6 +62,11 @@ const api = {
     delete: (id) => axios.delete(`${API_URL}/notifications/${id}`, { headers: getAuthHeaders() }),
   },
 
+  // Public Stats
+  stats: {
+    getPublic: () => axios.get(`${API_URL}/stats/public`),
+  },
+
   // Admin
   admin: {
     getStats: () => axios.get(`${API_URL}/admin/stats`, { headers: getAuthHeaders() }),
@@ -69,6 +76,8 @@ const api = {
     deleteUser: (id) => axios.delete(`${API_URL}/admin/users/${id}`, { headers: getAuthHeaders() }),
     getActivityLogs: (params) => axios.get(`${API_URL}/admin/activity-logs`, { params, headers: getAuthHeaders() }),
     getReports: (params) => axios.get(`${API_URL}/admin/reports`, { params, headers: getAuthHeaders() }),
+    getSettings: () => axios.get(`${API_URL}/admin/settings`, { headers: getAuthHeaders() }),
+    updateSettings: (data) => axios.put(`${API_URL}/admin/settings`, data, { headers: getAuthHeaders() }),
   },
 };
 
