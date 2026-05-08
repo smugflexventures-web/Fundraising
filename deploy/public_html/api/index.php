@@ -16,14 +16,14 @@ set_error_handler(function ($severity, $message, $file, $line) {
 
 set_exception_handler(function ($e) {
     error_log($e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
-    $debug = getenv('APP_DEBUG') === 'true';
     http_response_code(500);
     echo json_encode([
         'success' => false,
         'message' => 'Internal server error',
-        'error' => $debug ? $e->getMessage() : null,
-        'file' => $debug ? basename($e->getFile()) . ':' . $e->getLine() : null,
-    ]);
+        'error' => $e->getMessage(),
+        'file' => basename($e->getFile()) . ':' . $e->getLine(),
+        'trace' => $e->getTraceAsString(),
+    ], JSON_UNESCAPED_SLASHES);
     exit;
 });
 

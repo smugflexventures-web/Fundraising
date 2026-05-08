@@ -121,6 +121,39 @@ if ($hasEnv) {
                 ];
             }
         }
+
+        // Test exact queries used by failing API endpoints
+        $endpointQueries = [
+            '/api/campaigns/featured' => "SELECT * FROM campaigns WHERE is_featured = TRUE AND status = 'active' ORDER BY created_at DESC LIMIT 3",
+            '/api/campaigns (getActive)' => "SELECT c.*, u.first_name as creator_first_name, u.last_name as creator_last_name FROM campaigns c JOIN users u ON c.created_by = u.id WHERE c.status = 'active' ORDER BY c.is_featured DESC, c.created_at DESC LIMIT 10 OFFSET 0",
+            '/api/stats/public (donations total)' => "SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE status = 'completed'",
+            '/api/stats/public (donations count)' => "SELECT COUNT(*) as count FROM donations WHERE status = 'completed'",
+            '/api/stats/public (students count)' => "SELECT COUNT(*) as count FROM users WHERE role = 'student'",
+            '/api/stats/public (donors count)' => "SELECT COUNT(*) as count FROM users WHERE role = 'donor'",
+            '/api/stats/public (requests funded)' => "SELECT COALESCE(SUM(amount_funded), 0) as total FROM student_requests",
+            '/api/stats/public (funded count)' => "SELECT COUNT(*) as count FROM student_requests WHERE status = 'funded'",
+            '/api/stats/public (active campaigns)' => "SELECT COUNT(*) as count FROM campaigns WHERE status = 'active'",
+        ];
+
+        foreach ($endpointQueries as $endpoint => $sql) {
+            try {
+                $stmt = $pdo->query($sql);
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $checks[] = [
+                    'check' => "Endpoint Query: {$endpoint}",
+                    'value' => json_encode($result),
+                    'required' => 'Must not throw PDOException',
+                    'pass' => true,
+                ];
+            } catch (PDOException $e) {
+                $checks[] = [
+                    'check' => "Endpoint Query: {$endpoint}",
+                    'value' => 'FAILED: ' . $e->getMessage(),
+                    'required' => 'Must not throw PDOException',
+                    'pass' => false,
+                ];
+            }
+        }
     } catch (PDOException $e) {
         $checks[] = [
             'check' => 'Database Connection',

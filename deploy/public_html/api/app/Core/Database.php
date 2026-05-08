@@ -57,9 +57,17 @@ class Database
 
     public function query(string $sql, array $params = []): \PDOStatement
     {
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute($params);
-        return $stmt;
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            return $stmt;
+        } catch (PDOException $e) {
+            throw new \RuntimeException(
+                'SQL query failed: ' . $e->getMessage() . ' | SQL: ' . $sql . ' | Params: ' . json_encode($params),
+                0,
+                $e
+            );
+        }
     }
 
     public function fetch(string $sql, array $params = []): ?array
