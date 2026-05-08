@@ -26,6 +26,7 @@ class Mailer
         $this->mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $this->mail->Username = Config::get('MAIL_USERNAME', '');
         $this->mail->Password = Config::get('MAIL_PASSWORD', '');
+        $this->mail->Timeout = 5;
         $this->mail->setFrom(
             Config::get('MAIL_FROM_EMAIL', 'noreply@campusfund.edu'),
             Config::get('MAIL_FROM_NAME', 'CampusFund')

@@ -122,8 +122,16 @@ class AdminController
 
         $this->userModel->verifyEmail($id);
 
-        Helpers::createNotification($id, 'Account Verified', 'Your account has been verified by an administrator.', 'success');
-        Helpers::logActivity($authUser['user_id'], 'verify_user', "Verified account {$id}");
+        try {
+            Helpers::createNotification($id, 'Account Verified', 'Your account has been verified by an administrator.', 'success');
+        } catch (\Throwable $e) {
+            error_log('Notification error: ' . $e->getMessage());
+        }
+        try {
+            Helpers::logActivity($authUser['user_id'], 'verify_user', "Verified account {$id}");
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success([], 'Account verification confirmed');
     }
@@ -145,7 +153,11 @@ class AdminController
         $newStatus = !$user['is_active'];
         $this->userModel->update($id, ['is_active' => $newStatus]);
 
-        Helpers::logActivity($authUser['user_id'], 'toggle_user_status', "Account {$id} status changed to " . ($newStatus ? 'active' : 'inactive'));
+        try {
+            Helpers::logActivity($authUser['user_id'], 'toggle_user_status', "Account {$id} status changed to " . ($newStatus ? 'active' : 'inactive'));
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success([], 'Account status updated');
     }
@@ -164,7 +176,11 @@ class AdminController
         }
 
         $this->userModel->delete($id);
-        Helpers::logActivity($authUser['user_id'], 'delete_user', "Removed account {$id}");
+        try {
+            Helpers::logActivity($authUser['user_id'], 'delete_user', "Removed account {$id}");
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success([], 'Account removed');
     }
@@ -317,7 +333,11 @@ class AdminController
             }
         }
 
-        Helpers::logActivity($authUser['user_id'], 'update_settings', 'Platform configuration updated');
+        try {
+            Helpers::logActivity($authUser['user_id'], 'update_settings', 'Platform configuration updated');
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success([], 'Configuration updated');
     }

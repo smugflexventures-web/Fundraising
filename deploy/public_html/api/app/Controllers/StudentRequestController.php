@@ -155,15 +155,23 @@ class StudentRequestController
 
         $request = $this->requestModel->findById($requestId);
 
-        Helpers::createNotification(
-            $authUser['user_id'],
-            'Request Submitted',
-            'Your assistance request "' . $input['title'] . '" has been submitted and is pending administrative review.',
-            'info',
-            '/student/requests'
-        );
+        try {
+            Helpers::createNotification(
+                $authUser['user_id'],
+                'Request Submitted',
+                'Your assistance request "' . $input['title'] . '" has been submitted and is pending administrative review.',
+                'info',
+                '/student/requests'
+            );
+        } catch (\Throwable $e) {
+            error_log('Notification error: ' . $e->getMessage());
+        }
 
-        Helpers::logActivity($authUser['user_id'], 'create_request', 'Created request: ' . $input['title']);
+        try {
+            Helpers::logActivity($authUser['user_id'], 'create_request', 'Created request: ' . $input['title']);
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success(['request' => $request], 'Assistance request submitted', 201);
     }
@@ -195,7 +203,11 @@ class StudentRequestController
         $this->requestModel->update($id, $input);
         $request = $this->requestModel->findById($id);
 
-        Helpers::logActivity($authUser['user_id'], 'update_request', 'Updated request ID: ' . $id);
+        try {
+            Helpers::logActivity($authUser['user_id'], 'update_request', 'Updated request ID: ' . $id);
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success(['request' => $request], 'Request updated');
     }
@@ -229,22 +241,34 @@ class StudentRequestController
 
         $updatedRequest = $this->requestModel->findById($id);
 
-        Mailer::sendRequestStatusEmail(
-            $request['email'],
-            $request['first_name'],
-            ucfirst($input['status']),
-            $request['title']
-        );
+        try {
+            Mailer::sendRequestStatusEmail(
+                $request['email'],
+                $request['first_name'],
+                ucfirst($input['status']),
+                $request['title']
+            );
+        } catch (\Throwable $e) {
+            error_log('Request status email error: ' . $e->getMessage());
+        }
 
-        Helpers::createNotification(
-            $request['user_id'],
-            'Request ' . ucfirst($input['status']),
-            'Your assistance request "' . $request['title'] . '" has been ' . $input['status'] . '.',
-            $input['status'] === 'approved' || $input['status'] === 'funded' ? 'success' : 'warning',
-            '/student/requests'
-        );
+        try {
+            Helpers::createNotification(
+                $request['user_id'],
+                'Request ' . ucfirst($input['status']),
+                'Your assistance request "' . $request['title'] . '" has been ' . $input['status'] . '.',
+                $input['status'] === 'approved' || $input['status'] === 'funded' ? 'success' : 'warning',
+                '/student/requests'
+            );
+        } catch (\Throwable $e) {
+            error_log('Notification error: ' . $e->getMessage());
+        }
 
-        Helpers::logActivity($authUser['user_id'], 'update_request_status', "Request {$id} status changed to {$input['status']}");
+        try {
+            Helpers::logActivity($authUser['user_id'], 'update_request_status', "Request {$id} status changed to {$input['status']}");
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success(['request' => $updatedRequest], 'Request status updated');
     }
@@ -269,7 +293,11 @@ class StudentRequestController
 
         $this->requestModel->delete($id);
 
-        Helpers::logActivity($authUser['user_id'], 'delete_request', 'Deleted request ID: ' . $id);
+        try {
+            Helpers::logActivity($authUser['user_id'], 'delete_request', 'Deleted request ID: ' . $id);
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success([], 'Request deleted successfully');
     }
@@ -303,7 +331,11 @@ class StudentRequestController
             }
         }
 
-        Helpers::logActivity($authUser['user_id'], 'upload_documents', "Uploaded documents for request {$id}");
+        try {
+            Helpers::logActivity($authUser['user_id'], 'upload_documents', "Uploaded documents for request {$id}");
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success(['documents' => $uploadedDocs], 'Documents uploaded successfully');
     }

@@ -86,10 +86,23 @@ class AuthController
             'role' => $user['role'],
         ]);
 
-        Helpers::createNotification($userId, 'Account Created', 'Your account has been registered and is now active.', 'success');
-        Helpers::logActivity($userId, 'register', 'User registered', $_SERVER['REMOTE_ADDR'] ?? null, $_SERVER['HTTP_USER_AGENT'] ?? null);
+        try {
+            Helpers::createNotification($userId, 'Account Created', 'Your account has been registered and is now active.', 'success');
+        } catch (\Throwable $e) {
+            error_log('Notification error: ' . $e->getMessage());
+        }
 
-        Mailer::sendWelcomeEmail($user['email'], $user['first_name']);
+        try {
+            Helpers::logActivity($userId, 'register', 'User registered', $_SERVER['REMOTE_ADDR'] ?? null, $_SERVER['HTTP_USER_AGENT'] ?? null);
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
+
+        try {
+            Mailer::sendWelcomeEmail($user['email'], $user['first_name']);
+        } catch (\Throwable $e) {
+            error_log('Welcome email error: ' . $e->getMessage());
+        }
 
         unset($user['password']);
 
@@ -138,7 +151,11 @@ class AuthController
 
         unset($user['password']);
 
-        Helpers::logActivity($user['id'], 'login', 'User logged in', $_SERVER['REMOTE_ADDR'] ?? null, $_SERVER['HTTP_USER_AGENT'] ?? null);
+        try {
+            Helpers::logActivity($user['id'], 'login', 'User logged in', $_SERVER['REMOTE_ADDR'] ?? null, $_SERVER['HTTP_USER_AGENT'] ?? null);
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success([
             'user' => $user,
@@ -180,9 +197,17 @@ class AuthController
 
         $resetLink = (\App\Core\Config::get('APP_URL', 'http://localhost:5173')) . '/reset-password?token=' . $token;
 
-        Mailer::sendPasswordResetEmail($user['email'], $user['first_name'], $resetLink);
+        try {
+            Mailer::sendPasswordResetEmail($user['email'], $user['first_name'], $resetLink);
+        } catch (\Throwable $e) {
+            error_log('Password reset email error: ' . $e->getMessage());
+        }
 
-        Helpers::logActivity($user['id'], 'forgot_password', 'Password reset requested');
+        try {
+            Helpers::logActivity($user['id'], 'forgot_password', 'Password reset requested');
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success([], 'If the email exists, a reset link has been sent');
     }
@@ -225,8 +250,16 @@ class AuthController
         $this->userModel->updatePassword($user['id'], $input['password']);
         $passwordReset->deleteByEmail($reset['email']);
 
-        Helpers::logActivity($user['id'], 'reset_password', 'Password reset successful');
-        Helpers::createNotification($user['id'], 'Password Updated', 'Your account password has been changed.', 'success');
+        try {
+            Helpers::logActivity($user['id'], 'reset_password', 'Password reset successful');
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
+        try {
+            Helpers::createNotification($user['id'], 'Password Updated', 'Your account password has been changed.', 'success');
+        } catch (\Throwable $e) {
+            error_log('Notification error: ' . $e->getMessage());
+        }
 
         return Response::success([], 'Password has been updated');
     }
@@ -265,7 +298,11 @@ class AuthController
         $this->userModel->update($authUser['user_id'], $input);
         $user = $this->userModel->findById($authUser['user_id']);
 
-        Helpers::logActivity($authUser['user_id'], 'update_profile', 'Profile updated');
+        try {
+            Helpers::logActivity($authUser['user_id'], 'update_profile', 'Profile updated');
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success(['user' => $user], 'Profile updated');
     }
@@ -297,7 +334,11 @@ class AuthController
         }
 
         $this->userModel->updatePassword($authUser['user_id'], $rawNewPassword);
-        Helpers::logActivity($authUser['user_id'], 'change_password', 'Password changed');
+        try {
+            Helpers::logActivity($authUser['user_id'], 'change_password', 'Password changed');
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success([], 'Password has been changed');
     }

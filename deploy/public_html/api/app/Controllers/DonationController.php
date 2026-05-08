@@ -225,18 +225,30 @@ class DonationController
                         $campaign = (new Campaign())->findById($donation['campaign_id']);
                         $campaignTitle = $campaign['title'] ?? 'General Fund';
                     }
-                    Mailer::sendDonationConfirmation($donor['email'], $donor['first_name'], $donation['amount'], $campaignTitle);
+                    try {
+                        Mailer::sendDonationConfirmation($donor['email'], $donor['first_name'], $donation['amount'], $campaignTitle);
+                    } catch (\Throwable $e) {
+                        error_log('Donation email error: ' . $e->getMessage());
+                    }
                 }
 
-                Helpers::createNotification(
-                    $donation['donor_id'],
-                    'Contribution Processed',
-                    'Your contribution of NGN ' . number_format($donation['amount'], 2) . ' has been processed and recorded.',
-                    'success',
-                    '/donor/donations'
-                );
+                try {
+                    Helpers::createNotification(
+                        $donation['donor_id'],
+                        'Contribution Processed',
+                        'Your contribution of NGN ' . number_format($donation['amount'], 2) . ' has been processed and recorded.',
+                        'success',
+                        '/donor/donations'
+                    );
+                } catch (\Throwable $e) {
+                    error_log('Notification error: ' . $e->getMessage());
+                }
 
-                Helpers::logActivity($donation['donor_id'], 'donation_completed', "Contribution {$reference} completed");
+                try {
+                    Helpers::logActivity($donation['donor_id'], 'donation_completed', "Contribution {$reference} completed");
+                } catch (\Throwable $e) {
+                    error_log('Activity log error: ' . $e->getMessage());
+                }
 
                 $updatedDonation = $this->donationModel->findById($donation['id']);
                 return Response::success(['donation' => $updatedDonation], 'Payment verified and contribution recorded');
