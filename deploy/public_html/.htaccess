@@ -10,10 +10,11 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 RewriteCond %{HTTP:Authorization} ^(.*)
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%1,E=REDIRECT_HTTP_AUTHORIZATION:%1]
 
-# Route all non-file requests to React SPA (index.html)
-# API requests are handled by api/.htaccess FallbackResource
+# Route all non-file, non-API requests to React SPA (index.html)
+# CRITICAL: /api/ paths must be excluded so they reach api/.htaccess
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/api [NC]
 RewriteRule ^ index.html [QSA,L]
 
 # Security Headers

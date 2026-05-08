@@ -1,5 +1,5 @@
-# Route all requests to index.php (most reliable method for cPanel)
-FallbackResource /api/index.php
+# Route all 404s to index.php (most reliable cPanel method)
+ErrorDocument 404 /api/index.php
 
 # Pass Authorization header for CGI/FastCGI
 SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=
