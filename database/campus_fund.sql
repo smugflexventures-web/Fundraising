@@ -7,6 +7,20 @@
 -- ============================================
 
 -- ============================================
+-- Drop existing tables (in reverse dependency order)
+-- ============================================
+DROP TABLE IF EXISTS settings;
+DROP TABLE IF EXISTS activity_logs;
+DROP TABLE IF EXISTS password_resets;
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS payments;
+DROP TABLE IF EXISTS donations;
+DROP TABLE IF EXISTS campaigns;
+DROP TABLE IF EXISTS request_documents;
+DROP TABLE IF EXISTS student_requests;
+DROP TABLE IF EXISTS users;
+
+-- ============================================
 -- Users Table
 -- ============================================
 CREATE TABLE users (
@@ -32,7 +46,7 @@ CREATE TABLE users (
   INDEX idx_role (role),
   INDEX idx_student_id (student_id),
   INDEX idx_is_verified (is_verified)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
 -- Student Requests Table
@@ -60,7 +74,7 @@ CREATE TABLE student_requests (
   INDEX idx_category (category),
   INDEX idx_priority (priority),
   INDEX idx_created_at (created_at)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
 -- Request Documents Table
@@ -76,7 +90,7 @@ CREATE TABLE request_documents (
 
   FOREIGN KEY (request_id) REFERENCES student_requests(id) ON DELETE CASCADE,
   INDEX idx_request_id (request_id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
 -- Campaigns Table
@@ -132,7 +146,7 @@ CREATE TABLE donations (
   INDEX idx_status (status),
   INDEX idx_reference (reference),
   INDEX idx_created_at (created_at)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
 -- Payments Table
@@ -155,7 +169,7 @@ CREATE TABLE payments (
   INDEX idx_transaction_id (transaction_id),
   INDEX idx_status (status),
   INDEX idx_paid_at (paid_at)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
 -- Notifications Table
@@ -175,7 +189,7 @@ CREATE TABLE notifications (
   INDEX idx_is_read (is_read),
   INDEX idx_type (type),
   INDEX idx_created_at (created_at)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
 -- Password Resets Table
@@ -190,7 +204,7 @@ CREATE TABLE password_resets (
   INDEX idx_email (email),
   INDEX idx_token (token),
   INDEX idx_expires_at (expires_at)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
 -- Activity Logs Table
@@ -208,7 +222,7 @@ CREATE TABLE activity_logs (
   INDEX idx_user_id (user_id),
   INDEX idx_action (action),
   INDEX idx_created_at (created_at)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
 -- Admin Settings Table
@@ -221,7 +235,7 @@ CREATE TABLE settings (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   INDEX idx_setting_key (setting_key)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
 -- Seed Data
@@ -272,16 +286,16 @@ INSERT INTO payments (donation_id, transaction_id, provider, amount, currency, s
 -- Sample notifications
 INSERT INTO notifications (user_id, title, message, type, is_read) VALUES
 (2, 'Request Approved', 'Your tuition fee assistance request has been approved. You will be contacted shortly.', 'success', FALSE),
-(2, 'Donation Received', 'A donation of ₦50,000 has been made towards your tuition fee request.', 'info', TRUE),
+(2, 'Donation Received', 'A donation of NGN 50,000 has been made towards your tuition fee request.', 'info', TRUE),
 (3, 'Welcome to CampusFund', 'Your account has been created. Please verify your email to get started.', 'info', FALSE),
-(5, 'Donation Successful', 'Your donation of ₦50,000 to the Tuition Support Drive was successful. Thank you!', 'success', TRUE);
+(5, 'Donation Successful', 'Your donation of NGN 50,000 to the Tuition Support Drive was successful. Thank you!', 'success', TRUE);
 
 -- Default settings
 INSERT INTO settings (setting_key, setting_value) VALUES
 ('site_name', 'CampusFund'),
 ('site_description', 'Campus Fundraising and Donation Management System'),
 ('currency', 'NGN'),
-('currency_symbol', '₦'),
+('currency_symbol', 'NGN'),
 ('min_donation_amount', '1000'),
 ('max_donation_amount', '10000000'),
 ('enable_registration', 'true'),
