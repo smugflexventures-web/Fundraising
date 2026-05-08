@@ -1,22 +1,21 @@
 # Enable Rewrite Engine
 RewriteEngine On
+RewriteBase /
 
 # Force HTTPS
 RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Route API requests to the backend
-RewriteCond %{REQUEST_URI} ^/api [NC]
-RewriteRule ^api/(.*)$ api/public/index.php [QSA,L]
-
-# Pass Authorization header to backend for CGI/FastCGI
+# Pass Authorization header for CGI/FastCGI (must be before API routing)
 RewriteCond %{HTTP:Authorization} ^(.*)
-RewriteRule ^api/(.*)$ api/public/index.php [QSA,L,E=HTTP_AUTHORIZATION:%1,E=REDIRECT_HTTP_AUTHORIZATION:%1]
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%1,E=REDIRECT_HTTP_AUTHORIZATION:%1]
+
+# Route API requests to backend index.php
+RewriteRule ^api/(.*)$ api/public/index.php [QSA,L]
 
 # Route all other requests to React SPA (index.html)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_URI} !^/api [NC]
 RewriteRule ^ index.html [QSA,L]
 
 # Security Headers

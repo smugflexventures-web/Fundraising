@@ -1,16 +1,3 @@
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteBase /api/
-
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ public/index.php [QSA,L]
-
-    # Handle Authorization Header for CGI/FastCGI
-    RewriteCond %{HTTP:Authorization} ^(.*)
-    RewriteRule .* - [e=HTTP_AUTHORIZATION:%1,E=REDIRECT_HTTP_AUTHORIZATION:%1]
-</IfModule>
-
 # Prevent directory browsing
 Options -Indexes
 
