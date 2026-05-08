@@ -23,7 +23,14 @@ class AuthController
     public function register($params)
     {
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
+
+        // Don't sanitize password - special chars must be preserved for hashing
+        $rawPassword = $input['password'] ?? '';
+        $confirmPassword = $input['confirm_password'] ?? '';
         $input = Helpers::sanitize($input);
+        // Restore unsanitized passwords
+        $input['password'] = $rawPassword;
+        $input['confirm_password'] = $confirmPassword;
 
         $validator = new Validator($input);
         $validator->validate([
@@ -95,7 +102,11 @@ class AuthController
     public function login($params)
     {
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
+
+        // Don't sanitize password - special chars must be preserved for verification
+        $rawPassword = $input['password'] ?? '';
         $input = Helpers::sanitize($input);
+        $input['password'] = $rawPassword;
 
         $validator = new Validator($input);
         $validator->validate([
@@ -180,6 +191,10 @@ class AuthController
     {
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
 
+        // Don't sanitize passwords - special chars must be preserved for hashing
+        $rawPassword = $input['password'] ?? '';
+        $confirmPassword = $input['confirm_password'] ?? '';
+
         $validator = new Validator($input);
         $validator->validate([
             'token' => 'required',
@@ -190,6 +205,10 @@ class AuthController
         if ($validator->fails()) {
             return Response::error('Validation failed', 422, $validator->getErrors());
         }
+
+        // Use raw passwords for hashing
+        $input['password'] = $rawPassword;
+        $input['confirm_password'] = $confirmPassword;
 
         $passwordReset = new PasswordReset();
         $reset = $passwordReset->findByToken($input['token']);
@@ -221,7 +240,7 @@ class AuthController
 
         $user = $this->userModel->findById($authUser['user_id']);
         if (!$user) {
-            return Response::notFound('User not found');
+            return Response::notFound('Account not found');
         }
 
         return Response::success(['user' => $user]);
@@ -256,6 +275,11 @@ class AuthController
         $authUser = $GLOBALS['auth_user'] ?? null;
         $input = json_decode(file_get_contents('php://input'), true) ?? [];
 
+        // Don't sanitize passwords - special chars must be preserved
+        $rawCurrentPassword = $input['current_password'] ?? '';
+        $rawNewPassword = $input['new_password'] ?? '';
+        $rawConfirmPassword = $input['confirm_password'] ?? '';
+
         $validator = new Validator($input);
         $validator->validate([
             'current_password' => 'required',
@@ -268,11 +292,11 @@ class AuthController
         }
 
         $user = $this->userModel->findByEmail($authUser['email']);
-        if (!password_verify($input['current_password'], $user['password'])) {
+        if (!password_verify($rawCurrentPassword, $user['password'])) {
             return Response::error('The current password you entered is incorrect', 400);
         }
 
-        $this->userModel->updatePassword($authUser['user_id'], $input['new_password']);
+        $this->userModel->updatePassword($authUser['user_id'], $rawNewPassword);
         Helpers::logActivity($authUser['user_id'], 'change_password', 'Password changed');
 
         return Response::success([], 'Password has been changed');

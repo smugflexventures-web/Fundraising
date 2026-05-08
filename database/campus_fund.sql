@@ -241,17 +241,17 @@ CREATE TABLE settings (
 -- Seed Data
 -- ============================================
 
--- Admin user (password: Admin@123)
+-- Admin user (password: Password@123)
 INSERT INTO users (email, password, first_name, last_name, role, is_verified, is_active) VALUES
 ('admin@campusfund.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'System', 'Administrator', 'admin', TRUE, TRUE);
 
--- Sample student users (password: Student@123)
+-- Sample student users (password: Password@123)
 INSERT INTO users (email, password, first_name, last_name, role, student_id, department, level, is_verified, is_active) VALUES
 ('john@student.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'John', 'Doe', 'student', 'STU/2024/001', 'Computer Science', '300', TRUE, TRUE),
 ('jane@student.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Jane', 'Smith', 'student', 'STU/2024/002', 'Electrical Engineering', '200', TRUE, TRUE),
 ('ade@student.edu', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Ade', 'Okafor', 'student', 'STU/2024/003', 'Medicine', '400', TRUE, TRUE);
 
--- Sample donor users (password: Donor@123)
+-- Sample donor users (password: Password@123)
 INSERT INTO users (email, password, first_name, last_name, role, is_verified, is_active) VALUES
 ('donor1@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Michael', 'Johnson', 'donor', TRUE, TRUE),
 ('donor2@email.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Sarah', 'Williams', 'donor', TRUE, TRUE);

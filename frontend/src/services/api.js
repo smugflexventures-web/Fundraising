@@ -2,82 +2,110 @@ import axios from 'axios';
 
 const API_URL = '/api';
 
-const getAuthHeaders = () => {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
+// Centralized axios instance with automatic token injection and 401 handling
+const apiClient = axios.create({
+  baseURL: API_URL,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+// Request interceptor: attach Authorization header from localStorage
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor: auto-logout on 401
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      // Only redirect if not already on login/register pages
+      if (!window.location.pathname.match(/^\/(login|register|forgot-password|reset-password)/)) {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 const api = {
   // Auth
   auth: {
-    register: (data) => axios.post(`${API_URL}/auth/register`, data),
-    login: (data) => axios.post(`${API_URL}/auth/login`, data),
-    logout: () => axios.post(`${API_URL}/auth/logout`, {}, { headers: getAuthHeaders() }),
-    me: () => axios.get(`${API_URL}/auth/me`, { headers: getAuthHeaders() }),
-    forgotPassword: (data) => axios.post(`${API_URL}/auth/forgot-password`, data),
-    resetPassword: (data) => axios.post(`${API_URL}/auth/reset-password`, data),
-    updateProfile: (data) => axios.put(`${API_URL}/auth/profile`, data, { headers: getAuthHeaders() }),
-    changePassword: (data) => axios.put(`${API_URL}/auth/change-password`, data, { headers: getAuthHeaders() }),
+    register: (data) => apiClient.post('/auth/register', data),
+    login: (data) => apiClient.post('/auth/login', data),
+    logout: () => apiClient.post('/auth/logout'),
+    me: () => apiClient.get('/auth/me'),
+    forgotPassword: (data) => apiClient.post('/auth/forgot-password', data),
+    resetPassword: (data) => apiClient.post('/auth/reset-password', data),
+    updateProfile: (data) => apiClient.put('/auth/profile', data),
+    changePassword: (data) => apiClient.put('/auth/change-password', data),
   },
 
   // Campaigns
   campaigns: {
-    getAll: (params) => axios.get(`${API_URL}/campaigns`, { params, headers: getAuthHeaders() }),
-    getFeatured: () => axios.get(`${API_URL}/campaigns/featured`),
-    getById: (id) => axios.get(`${API_URL}/campaigns/${id}`, { headers: getAuthHeaders() }),
-    create: (formData) => axios.post(`${API_URL}/campaigns`, formData, { headers: { ...getAuthHeaders(), 'Content-Type': 'multipart/form-data' } }),
-    update: (id, data) => axios.put(`${API_URL}/campaigns/${id}`, data, { headers: getAuthHeaders() }),
-    updateWithImage: (id, formData) => axios.post(`${API_URL}/campaigns/${id}/update`, formData, { headers: { ...getAuthHeaders(), 'Content-Type': 'multipart/form-data' } }),
-    delete: (id) => axios.delete(`${API_URL}/campaigns/${id}`, { headers: getAuthHeaders() }),
+    getAll: (params) => apiClient.get('/campaigns', { params }),
+    getFeatured: () => apiClient.get('/campaigns/featured'),
+    getById: (id) => apiClient.get(`/campaigns/${id}`),
+    create: (formData) => apiClient.post('/campaigns', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    update: (id, data) => apiClient.put(`/campaigns/${id}`, data),
+    updateWithImage: (id, formData) => apiClient.post(`/campaigns/${id}/update`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    delete: (id) => apiClient.delete(`/campaigns/${id}`),
   },
 
   // Student Requests
   requests: {
-    getAll: (params) => axios.get(`${API_URL}/requests`, { params, headers: getAuthHeaders() }),
-    getStats: () => axios.get(`${API_URL}/requests/stats`, { headers: getAuthHeaders() }),
-    getById: (id) => axios.get(`${API_URL}/requests/${id}`, { headers: getAuthHeaders() }),
-    create: (formData) => axios.post(`${API_URL}/requests`, formData, { headers: { ...getAuthHeaders(), 'Content-Type': 'multipart/form-data' } }),
-    update: (id, data) => axios.put(`${API_URL}/requests/${id}`, data, { headers: getAuthHeaders() }),
-    updateStatus: (id, data) => axios.put(`${API_URL}/requests/${id}/status`, data, { headers: getAuthHeaders() }),
-    delete: (id) => axios.delete(`${API_URL}/requests/${id}`, { headers: getAuthHeaders() }),
-    uploadDocuments: (id, formData) => axios.post(`${API_URL}/requests/${id}/documents`, formData, { headers: { ...getAuthHeaders(), 'Content-Type': 'multipart/form-data' } }),
+    getAll: (params) => apiClient.get('/requests', { params }),
+    getStats: () => apiClient.get('/requests/stats'),
+    getById: (id) => apiClient.get(`/requests/${id}`),
+    create: (formData) => apiClient.post('/requests', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+    update: (id, data) => apiClient.put(`/requests/${id}`, data),
+    updateStatus: (id, data) => apiClient.put(`/requests/${id}/status`, data),
+    delete: (id) => apiClient.delete(`/requests/${id}`),
+    uploadDocuments: (id, formData) => apiClient.post(`/requests/${id}/documents`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
   },
 
   // Donations
   donations: {
-    getAll: (params) => axios.get(`${API_URL}/donations`, { params, headers: getAuthHeaders() }),
-    getStats: () => axios.get(`${API_URL}/donations/stats`, { headers: getAuthHeaders() }),
-    getById: (id) => axios.get(`${API_URL}/donations/${id}`, { headers: getAuthHeaders() }),
-    initialize: (data) => axios.post(`${API_URL}/donations/initialize`, data, { headers: getAuthHeaders() }),
-    verify: (reference) => axios.post(`${API_URL}/donations/verify`, { reference }, { headers: getAuthHeaders() }),
-    history: (params) => axios.get(`${API_URL}/donations/history`, { params, headers: getAuthHeaders() }),
+    getAll: (params) => apiClient.get('/donations', { params }),
+    getStats: () => apiClient.get('/donations/stats'),
+    getById: (id) => apiClient.get(`/donations/${id}`),
+    initialize: (data) => apiClient.post('/donations/initialize', data),
+    verify: (reference) => apiClient.post('/donations/verify', { reference }),
+    history: (params) => apiClient.get('/donations/history', { params }),
   },
 
   // Notifications
   notifications: {
-    getAll: (params) => axios.get(`${API_URL}/notifications`, { params, headers: getAuthHeaders() }),
-    getUnreadCount: () => axios.get(`${API_URL}/notifications/unread-count`, { headers: getAuthHeaders() }),
-    markRead: (id) => axios.put(`${API_URL}/notifications/${id}/read`, {}, { headers: getAuthHeaders() }),
-    markAllRead: () => axios.put(`${API_URL}/notifications/read-all`, {}, { headers: getAuthHeaders() }),
-    delete: (id) => axios.delete(`${API_URL}/notifications/${id}`, { headers: getAuthHeaders() }),
+    getAll: (params) => apiClient.get('/notifications', { params }),
+    getUnreadCount: () => apiClient.get('/notifications/unread-count'),
+    markRead: (id) => apiClient.put(`/notifications/${id}/read`),
+    markAllRead: () => apiClient.put('/notifications/read-all'),
+    delete: (id) => apiClient.delete(`/notifications/${id}`),
   },
 
   // Public Stats
   stats: {
-    getPublic: () => axios.get(`${API_URL}/stats/public`),
+    getPublic: () => apiClient.get('/stats/public'),
   },
 
   // Admin
   admin: {
-    getStats: () => axios.get(`${API_URL}/admin/stats`, { headers: getAuthHeaders() }),
-    getUsers: (params) => axios.get(`${API_URL}/admin/users`, { params, headers: getAuthHeaders() }),
-    verifyUser: (id) => axios.put(`${API_URL}/admin/users/${id}/verify`, {}, { headers: getAuthHeaders() }),
-    toggleUserStatus: (id) => axios.put(`${API_URL}/admin/users/${id}/toggle-status`, {}, { headers: getAuthHeaders() }),
-    deleteUser: (id) => axios.delete(`${API_URL}/admin/users/${id}`, { headers: getAuthHeaders() }),
-    getActivityLogs: (params) => axios.get(`${API_URL}/admin/activity-logs`, { params, headers: getAuthHeaders() }),
-    getReports: (params) => axios.get(`${API_URL}/admin/reports`, { params, headers: getAuthHeaders() }),
-    getSettings: () => axios.get(`${API_URL}/admin/settings`, { headers: getAuthHeaders() }),
-    updateSettings: (data) => axios.put(`${API_URL}/admin/settings`, data, { headers: getAuthHeaders() }),
+    getStats: () => apiClient.get('/admin/stats'),
+    getUsers: (params) => apiClient.get('/admin/users', { params }),
+    verifyUser: (id) => apiClient.put(`/admin/users/${id}/verify`),
+    toggleUserStatus: (id) => apiClient.put(`/admin/users/${id}/toggle-status`),
+    deleteUser: (id) => apiClient.delete(`/admin/users/${id}`),
+    getActivityLogs: (params) => apiClient.get('/admin/activity-logs', { params }),
+    getReports: (params) => apiClient.get('/admin/reports', { params }),
+    getSettings: () => apiClient.get('/admin/settings'),
+    updateSettings: (data) => apiClient.put('/admin/settings', data),
   },
 };
 

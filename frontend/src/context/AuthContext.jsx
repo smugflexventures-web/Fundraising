@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 
@@ -14,11 +14,54 @@ export const useAuth = () => {
 
 const API_URL = '/api';
 
+// Create a centralized axios instance with interceptors
+const apiClient = axios.create({
+  baseURL: API_URL,
+  headers: { 'Content-Type': 'application/json' },
+});
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
 
+  const logout = useCallback(() => {
+    localStorage.removeItem('token');
+    setToken(null);
+    setUser(null);
+  }, []);
+
+  // Request interceptor: attach Authorization header automatically
+  useEffect(() => {
+    const requestInterceptor = apiClient.interceptors.request.use(
+      (config) => {
+        const savedToken = localStorage.getItem('token');
+        if (savedToken) {
+          config.headers.Authorization = `Bearer ${savedToken}`;
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
+
+    // Response interceptor: auto-logout on 401
+    const responseInterceptor = apiClient.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          logout();
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      apiClient.interceptors.request.eject(requestInterceptor);
+      apiClient.interceptors.response.eject(responseInterceptor);
+    };
+  }, [logout]);
+
+  // On mount: check saved token validity and fetch user
   useEffect(() => {
     const savedToken = localStorage.getItem('token');
     if (savedToken) {
@@ -36,11 +79,11 @@ export const AuthProvider = ({ children }) => {
     } else {
       setLoading(false);
     }
-  }, []);
+  }, [logout]);
 
   const fetchUser = async (authToken) => {
     try {
-      const response = await axios.get(`${API_URL}/auth/me`, {
+      const response = await apiClient.get('/auth/me', {
         headers: { Authorization: `Bearer ${authToken}` },
       });
       setUser(response.data.data.user);
@@ -52,7 +95,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (userData) => {
-    const response = await axios.post(`${API_URL}/auth/register`, userData);
+    const response = await apiClient.post('/auth/register', userData);
     const { token: newToken, user: newUser } = response.data.data;
     localStorage.setItem('token', newToken);
     setToken(newToken);
@@ -61,7 +104,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (credentials) => {
-    const response = await axios.post(`${API_URL}/auth/login`, credentials);
+    const response = await apiClient.post('/auth/login', credentials);
     const { token: newToken, user: newUser } = response.data.data;
     localStorage.setItem('token', newToken);
     setToken(newToken);
@@ -69,19 +112,13 @@ export const AuthProvider = ({ children }) => {
     return response.data;
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    setToken(null);
-    setUser(null);
-  };
-
   const forgotPassword = async (email) => {
-    const response = await axios.post(`${API_URL}/auth/forgot-password`, { email });
+    const response = await apiClient.post('/auth/forgot-password', { email });
     return response.data;
   };
 
   const resetPassword = async (token, password, confirm_password) => {
-    const response = await axios.post(`${API_URL}/auth/reset-password`, {
+    const response = await apiClient.post('/auth/reset-password', {
       token,
       password,
       confirm_password,
@@ -90,17 +127,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateProfile = async (data) => {
-    const response = await axios.put(`${API_URL}/auth/profile`, data, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await apiClient.put('/auth/profile', data);
     setUser(response.data.data.user);
     return response.data;
   };
 
   const changePassword = async (data) => {
-    const response = await axios.put(`${API_URL}/auth/change-password`, data, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await apiClient.put('/auth/change-password', data);
     return response.data;
   };
 
