@@ -64,6 +64,20 @@ if ($hasEnv) {
     $dbUser = $envVars['DB_USERNAME'] ?? '';
     $dbPass = $envVars['DB_PASSWORD'] ?? '';
 
+    $checks[] = [
+        'check' => 'DB Username Sanity Check',
+        'value' => $dbUser === '' ? 'Empty' : $dbUser,
+        'required' => 'Do not use root on cPanel; use a cPanel-created MySQL user',
+        'pass' => $dbUser !== '' && strtolower($dbUser) !== 'root',
+    ];
+
+    $checks[] = [
+        'check' => 'DB Password Provided',
+        'value' => $dbPass === '' ? 'EMPTY' : 'Provided (hidden)',
+        'required' => 'Required (most hosts do not allow empty DB passwords)',
+        'pass' => $dbPass !== '',
+    ];
+
     try {
         $dsn = "mysql:host={$dbHost};port={$dbPort};dbname={$dbName};charset=utf8mb4";
         $pdo = new PDO($dsn, $dbUser, $dbPass, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
