@@ -88,15 +88,39 @@ if ($hasEnv) {
             'pass' => true,
         ];
 
-        // Check users table
-        $stmt = $pdo->query("SELECT COUNT(*) FROM users");
-        $userCount = $stmt->fetchColumn();
-        $checks[] = [
-            'check' => 'Users Table',
-            'value' => "{$userCount} users found",
-            'required' => 'Required for auth',
-            'pass' => $userCount > 0,
+        // Check ALL required tables (not just users)
+        $requiredTables = [
+            'users' => 'Required for auth',
+            'campaigns' => 'Required for /api/campaigns/*',
+            'donations' => 'Required for /api/donations/* and /api/stats/public',
+            'student_requests' => 'Required for /api/requests/* and /api/stats/public',
+            'request_documents' => 'Required for document uploads',
+            'notifications' => 'Required for /api/notifications/*',
+            'password_resets' => 'Required for password reset',
+            'activity_logs' => 'Required for admin activity logs',
+            'settings' => 'Required for admin settings',
+            'payments' => 'Required for payment tracking',
         ];
+
+        foreach ($requiredTables as $table => $purpose) {
+            try {
+                $stmt = $pdo->query("SELECT COUNT(*) FROM `{$table}`");
+                $count = $stmt->fetchColumn();
+                $checks[] = [
+                    'check' => "Table: {$table}",
+                    'value' => "{$count} rows",
+                    'required' => $purpose,
+                    'pass' => true,
+                ];
+            } catch (PDOException $e) {
+                $checks[] = [
+                    'check' => "Table: {$table}",
+                    'value' => 'MISSING - Import campus_fund.sql!',
+                    'required' => $purpose,
+                    'pass' => false,
+                ];
+            }
+        }
     } catch (PDOException $e) {
         $checks[] = [
             'check' => 'Database Connection',
@@ -105,9 +129,9 @@ if ($hasEnv) {
             'pass' => false,
         ];
         $checks[] = [
-            'check' => 'Users Table',
-            'value' => 'Cannot check - DB connection failed',
-            'required' => 'Required for auth',
+            'check' => 'Database Tables',
+            'value' => 'Skipped - DB connection failed',
+            'required' => 'All tables required',
             'pass' => false,
         ];
     }

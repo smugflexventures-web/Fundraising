@@ -49,10 +49,10 @@ $router->post('/requests/{id}/documents', 'StudentRequestController@uploadDocume
 // ============================================
 $router->get('/donations', 'DonationController@index', ['AuthMiddleware']);
 $router->get('/donations/stats', 'DonationController@donorStats', ['AuthMiddleware']);
+$router->get('/donations/history', 'DonationController@history', ['AuthMiddleware']);
 $router->get('/donations/{id}', 'DonationController@show', ['AuthMiddleware']);
 $router->post('/donations/initialize', 'DonationController@initialize', ['AuthMiddleware']);
 $router->post('/donations/verify', 'DonationController@verify', ['AuthMiddleware']);
-$router->get('/donations/history', 'DonationController@history', ['AuthMiddleware']);
 
 // ============================================
 // Notification Routes
