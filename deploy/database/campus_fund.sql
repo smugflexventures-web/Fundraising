@@ -2,12 +2,9 @@
 -- Campus Fundraising and Donation Management System
 -- Database Schema
 -- ============================================
-
-CREATE DATABASE IF NOT EXISTS campus_fund
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_unicode_ci;
-
-USE campus_fund;
+-- Import this file into your existing cPanel database
+-- (e.g., mdpjhtua_fund) via phpMyAdmin
+-- ============================================
 
 -- ============================================
 -- Users Table
