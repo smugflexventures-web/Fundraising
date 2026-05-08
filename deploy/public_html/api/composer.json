@@ -13,6 +13,11 @@
       "App\\": "app/"
     }
   },
+  "config": {
+    "audit": {
+      "block-insecure": false
+    }
+  },
   "scripts": {
     "start": "php -S localhost:8000 -t public"
   }
