@@ -60,32 +60,32 @@ copyFile(path.join(backendSrc, '.env.example'), path.join(DEPLOY, 'public_html/a
 copyFile(path.join(backendSrc, '.htaccess'), path.join(DEPLOY, 'public_html/api/.htaccess'));
 
 // Copy .env for production (user needs to edit this)
-const envContent = `APP_ENV=production
+const envContent = `APP_NAME="CampusFund"
+APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://anns.com.gracelandroyalacademy.com.ng
 
 DB_HOST=localhost
 DB_PORT=3306
-DB_DATABASE=your_db_name
-DB_USERNAME=your_db_user
-DB_PASSWORD=your_db_password
+DB_DATABASE=mdpjhtua_fund
+DB_USERNAME=mdpjhtua_fund
+DB_PASSWORD=159075321@Au
 
-JWT_SECRET=change_this_to_a_secure_random_string_32chars
+JWT_SECRET=campusfund_2024_secure_jwt_key_x9k2m7p4q1
 JWT_EXPIRATION=86400
 
-MAIL_HOST=smtp.your-provider.com
+MAIL_HOST=smtp.gmail.com
 MAIL_PORT=587
-MAIL_USERNAME=your_email@domain.com
-MAIL_PASSWORD=your_email_password
-MAIL_FROM_ADDRESS=noreply@gracelandroyalacademy.com.ng
-MAIL_FROM_NAME=CampusFund
+MAIL_USERNAME=your_email@gmail.com
+MAIL_PASSWORD=your_app_password
+MAIL_FROM_EMAIL=noreply@gracelandroyalacademy.com.ng
+MAIL_FROM_NAME="CampusFund"
 
 PAYSTACK_SECRET_KEY=sk_test_xxx
 PAYSTACK_PUBLIC_KEY=pk_test_xxx
 
 UPLOAD_MAX_SIZE=5242880
-UPLOAD_PATH=uploads
-ALLOWED_TYPES=jpg,jpeg,png,pdf
+UPLOAD_PATH=uploads/
 `;
 fs.writeFileSync(path.join(DEPLOY, 'public_html/api/.env'), envContent);
 
