@@ -4,8 +4,8 @@ namespace App\Core;
 
 class App
 {
-    private $router;
-    private $request;
+    private Router $router;
+    private Request $request;
 
     public function __construct()
     {
