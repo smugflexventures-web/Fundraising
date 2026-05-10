@@ -1,6 +1,6 @@
-# CampusFund — Campus Financial Assistance & Contribution Platform
+# Design and Implementation of a Secure, User-Friendly Web-Based Campus Fundraising and Donation Management System for Student Financial and Emergency Assistance
 
-**A Full-Stack Web Application for Managing Student Financial Aid Requests, Fundraising Campaigns, and Secure Online Contributions**
+**CampusFund — A Full-Stack Web Application for Managing Student Financial Aid Requests, Fundraising Campaigns, and Secure Online Contributions**
 
 ---
 
@@ -37,12 +37,12 @@
 
 ## 1. Project Title
 
-### CampusFund: A Comprehensive Campus Financial Assistance and Contribution Management System
+### Design and Implementation of a Secure, User-Friendly Web-Based Campus Fundraising and Donation Management System for Student Financial and Emergency Assistance
 
-**Subtitle:** Bridging the Gap Between Student Financial Needs and Community Support Through Digital Innovation
+**Short Title:** CampusFund — Campus Financial Assistance & Contribution Management System
 
 **Version:** 1.0.0  
-**Date:** May 2024  
+**Date:** May 2026  
 **Institution:** Graceland Royal Academy, Nigeria  
 **Domain:** https://anns.com.gracelandroyalacademy.com.ng
 
@@ -50,7 +50,7 @@
 
 ## 2. Project Abstract
 
-CampusFund represents a pioneering digital solution designed to revolutionize student financial assistance management within Nigerian educational institutions. This comprehensive web-based platform addresses the critical challenge of connecting financially disadvantaged students with willing contributors through a transparent, secure, and efficient digital ecosystem.
+This project presents the design and implementation of a secure, user-friendly web-based campus fundraising and donation management system for student financial and emergency assistance. The system, branded CampusFund, addresses the critical challenge of connecting financially disadvantaged students with willing contributors through a transparent, secure, and efficient digital ecosystem within Nigerian educational institutions.
 
 The system implements a sophisticated role-based architecture serving three primary user categories: students seeking financial aid, donors providing contributions, and administrators overseeing platform operations. By digitizing the entire financial assistance lifecycle—from request submission through approval to funding—CampusFund eliminates traditional manual processes characterized by opacity, delays, and inefficiency.
 
