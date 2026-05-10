@@ -44,7 +44,7 @@
 **Version:** 1.0.0  
 **Date:** May 2026  
 **Institution:** Graceland Royal Academy, Nigeria  
-**Domain:** https://smugflex.com
+**Domain:** https://smugflex.com.ng
 
 ---
 
@@ -1656,10 +1656,10 @@ class App {
             'http://localhost:5173',
             'http://localhost:3000',
             'http://127.0.0.1:5173',
-            'https://smugflex.com',
-            'http://smugflex.com',
-            'https://www.smugflex.com',
-            'http://www.smugflex.com',
+            'https://smugflex.com.ng',
+            'http://smugflex.com.ng',
+            'https://www.smugflex.com.ng',
+            'http://www.smugflex.com.ng',
         ];
 
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
@@ -2724,7 +2724,7 @@ Using cPanel File Manager or FTP:
 # Edit public_html/api/.env
 APP_ENV=production
 APP_DEBUG=false
-APP_URL=https://smugflex.com
+APP_URL=https://smugflex.com.ng
 
 DB_HOST=localhost
 DB_PORT=3306
@@ -2737,7 +2737,7 @@ JWT_EXPIRATION=86400
 
 MAIL_HOST=smtp.gmail.com
 MAIL_PORT=587
-MAIL_USERNAME=noreply@smugflex.com
+MAIL_USERNAME=noreply@smugflex.com.ng
 MAIL_PASSWORD=app_password
 
 PAYSTACK_SECRET_KEY=sk_live_xxx
@@ -2845,7 +2845,7 @@ RewriteRule ^(.*)$ index.php [QSA,L]
 
 # CORS headers for API
 <IfModule mod_headers.c>
-    Header set Access-Control-Allow-Origin "https://smugflex.com"
+    Header set Access-Control-Allow-Origin "https://smugflex.com.ng"
     Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
     Header set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
     Header set Access-Control-Allow-Credentials "true"
@@ -2880,7 +2880,7 @@ max_connections = 100
 **Let's Encrypt Setup**:
 ```
 1. cPanel → SSL/TLS → Let's Encrypt
-2. Select domain: smugflex.com
+2. Select domain: smugflex.com.ng
 3. Generate certificate
 4. Force HTTPS redirect in .htaccess
 ```
@@ -2890,7 +2890,7 @@ max_connections = 100
 **Log Monitoring**:
 ```bash
 # Access logs
-tail -f /usr/local/apache/domlogs/smugflex.com
+tail -f /usr/local/apache/domlogs/smugflex.com.ng
 
 # Error logs
 tail -f /home/username/logs/error_log
@@ -3916,7 +3916,7 @@ The system's technical excellence, security implementation, and operational effe
 *Developed by: [Your Name]*
 *Institution: Graceland Royal Academy*
 *Date: May 2024*
-*Domain: https://smugflex.com* 
+*Domain: https://smugflex.com.ng* 
 
 ---
 
