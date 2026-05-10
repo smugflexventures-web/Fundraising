@@ -30,6 +30,7 @@ const RequestDetailPage = lazy(() => import('../pages/student/RequestDetailPage'
 const DonorDashboard = lazy(() => import('../pages/donor/DonorDashboard'));
 const DonorDonations = lazy(() => import('../pages/donor/DonorDonations'));
 const DonatePage = lazy(() => import('../pages/donor/DonatePage'));
+const DonationVerifyPage = lazy(() => import('../pages/donor/DonationVerifyPage'));
 
 // Admin Pages (lazy)
 const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'));
@@ -75,6 +76,7 @@ function AppRoutes() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/campaigns" element={<CampaignsPage />} />
           <Route path="/campaigns/:id" element={<CampaignDetailPage />} />
+          <Route path="/donation/verify" element={<DonationVerifyPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -98,6 +100,7 @@ function AppRoutes() {
           <Route path="/donor" element={<DonorDashboard />} />
           <Route path="/donor/donations" element={<DonorDonations />} />
           <Route path="/donor/donate/:campaignId?" element={<DonatePage />} />
+          <Route path="/donor/donate-request/:requestId" element={<DonatePage />} />
           <Route path="/donor/profile" element={<ProfilePage />} />
           <Route path="/donor/notifications" element={<NotificationsPage />} />
         </Route>

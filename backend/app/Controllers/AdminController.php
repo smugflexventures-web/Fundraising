@@ -122,8 +122,16 @@ class AdminController
 
         $this->userModel->verifyEmail($id);
 
-        Helpers::createNotification($id, 'Account Verified', 'Your account has been verified by an administrator.', 'success');
-        Helpers::logActivity($authUser['user_id'], 'verify_user', "Verified account {$id}");
+        try {
+            Helpers::createNotification($id, 'Account Verified', 'Your account has been verified by an administrator.', 'success');
+        } catch (\Throwable $e) {
+            error_log('Notification error: ' . $e->getMessage());
+        }
+        try {
+            Helpers::logActivity($authUser['user_id'], 'verify_user', "Verified account {$id}");
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success([], 'Account verification confirmed');
     }
@@ -145,7 +153,11 @@ class AdminController
         $newStatus = !$user['is_active'];
         $this->userModel->update($id, ['is_active' => $newStatus]);
 
-        Helpers::logActivity($authUser['user_id'], 'toggle_user_status', "Account {$id} status changed to " . ($newStatus ? 'active' : 'inactive'));
+        try {
+            Helpers::logActivity($authUser['user_id'], 'toggle_user_status', "Account {$id} status changed to " . ($newStatus ? 'active' : 'inactive'));
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success([], 'Account status updated');
     }
@@ -159,12 +171,27 @@ class AdminController
             return Response::error('Account ID is required', 400);
         }
 
+        $user = $this->userModel->findById($id);
+        if (!$user) {
+            return Response::notFound('Account not found');
+        }
+
         if ($id == $authUser['user_id']) {
             return Response::error('You cannot remove your own account', 400);
         }
 
-        $this->userModel->delete($id);
-        Helpers::logActivity($authUser['user_id'], 'delete_user', "Removed account {$id}");
+        try {
+            $this->userModel->delete($id);
+        } catch (\Throwable $e) {
+            error_log('Delete user error: ' . $e->getMessage());
+            return Response::error('Failed to remove account: ' . $e->getMessage(), 500);
+        }
+
+        try {
+            Helpers::logActivity($authUser['user_id'], 'delete_user', "Removed account {$id}");
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success([], 'Account removed');
     }
@@ -295,13 +322,14 @@ class AdminController
     public function updateSettings($params)
     {
         $authUser = $GLOBALS['auth_user'] ?? null;
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $input = $GLOBALS['request_body'] ?? [];
         $input = Helpers::sanitize($input);
 
         $allowedKeys = [
             'site_name', 'site_description', 'currency', 'currency_symbol',
             'min_donation_amount', 'max_donation_amount',
             'enable_registration', 'enable_email_verification', 'maintenance_mode',
+            'bank_name', 'bank_account_number', 'bank_account_name', 'bank_sort_code',
         ];
 
         $db = \App\Core\Database::getInstance();
@@ -317,7 +345,11 @@ class AdminController
             }
         }
 
-        Helpers::logActivity($authUser['user_id'], 'update_settings', 'Platform configuration updated');
+        try {
+            Helpers::logActivity($authUser['user_id'], 'update_settings', 'Platform configuration updated');
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success([], 'Configuration updated');
     }

@@ -15,6 +15,17 @@ class Request
     public function __construct()
     {
         $this->method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+        // Support method override for environments that don't handle PUT/DELETE
+        // Check X-HTTP-Method-Override header first, then _method in POST body
+        if ($this->method === 'POST') {
+            $override = $_SERVER['HTTP_X_HTTP_METHOD_OVERRIDE']
+                ?? $_POST['_method']
+                ?? null;
+            if ($override && in_array(strtoupper($override), ['PUT', 'PATCH', 'DELETE'])) {
+                $this->method = strtoupper($override);
+            }
+        }
         $this->uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
         // Strip the /api prefix (deployment rewrites /api/* to api/public/index.php)
@@ -37,6 +48,10 @@ class Request
         $this->server = $_SERVER;
         $this->headers = $this->getAllHeaders();
         $this->body = $this->parseBody();
+
+        // Store parsed body globally so controllers can access it
+        // (php://input can only be read once)
+        $GLOBALS['request_body'] = $this->body;
     }
 
     private function getAllHeaders()

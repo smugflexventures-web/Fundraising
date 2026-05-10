@@ -57,7 +57,7 @@ class DonationController
     public function initialize(array $params)
     {
         $authUser = $GLOBALS['auth_user'] ?? null;
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $input = $GLOBALS['request_body'] ?? [];
         $input = Helpers::sanitize($input);
 
         $validator = new Validator($input);
@@ -67,6 +67,18 @@ class DonationController
 
         if ($validator->fails()) {
             return Response::error('Validation failed', 422, $validator->getErrors());
+        }
+
+        // Validate request_id if provided — only approved requests accept donations
+        if (!empty($input['request_id'])) {
+            $requestModel = new StudentRequest();
+            $studentRequest = $requestModel->findById($input['request_id']);
+            if (!$studentRequest) {
+                return Response::notFound('Assistance request not found');
+            }
+            if ($studentRequest['status'] !== 'approved' && $studentRequest['status'] !== 'funded') {
+                return Response::error('Only approved requests can receive contributions', 400);
+            }
         }
 
         $reference = Helpers::generateReference('DON');
@@ -147,7 +159,7 @@ class DonationController
 
     public function verify(array $params)
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $input = $GLOBALS['request_body'] ?? [];
         $reference = $input['reference'] ?? $_GET['reference'] ?? null;
 
         if (!$reference) {
@@ -211,8 +223,46 @@ class DonationController
                     if ($request) {
                         $newFunded = $request['amount_funded'] + $donation['amount'];
                         $requestModel->update($donation['request_id'], ['amount_funded' => $newFunded]);
+
+                        // Notify student about the funding progress
+                        try {
+                            Helpers::createNotification(
+                                $request['user_id'],
+                                'Funding Received',
+                                'Your request "' . $request['title'] . '" has received NGN ' . number_format($donation['amount'], 2) . ' in funding.',
+                                'success',
+                                '/student/requests'
+                            );
+                        } catch (\Throwable $e) {
+                            error_log('Student notification error: ' . $e->getMessage());
+                        }
+
                         if ($newFunded >= $request['amount_needed']) {
                             $requestModel->updateStatus($donation['request_id'], 'funded', null, 'Fully funded through contributions');
+
+                            // Notify student that request is fully funded
+                            try {
+                                Helpers::createNotification(
+                                    $request['user_id'],
+                                    'Request Fully Funded',
+                                    'Your assistance request "' . $request['title'] . '" has been fully funded!',
+                                    'success',
+                                    '/student/requests'
+                                );
+                            } catch (\Throwable $e) {
+                                error_log('Student notification error: ' . $e->getMessage());
+                            }
+
+                            try {
+                                Mailer::sendRequestStatusEmail(
+                                    $request['email'],
+                                    $request['first_name'],
+                                    'Funded',
+                                    $request['title']
+                                );
+                            } catch (\Throwable $e) {
+                                error_log('Student email error: ' . $e->getMessage());
+                            }
                         }
                     }
                 }
@@ -225,18 +275,30 @@ class DonationController
                         $campaign = (new Campaign())->findById($donation['campaign_id']);
                         $campaignTitle = $campaign['title'] ?? 'General Fund';
                     }
-                    Mailer::sendDonationConfirmation($donor['email'], $donor['first_name'], $donation['amount'], $campaignTitle);
+                    try {
+                        Mailer::sendDonationConfirmation($donor['email'], $donor['first_name'], $donation['amount'], $campaignTitle);
+                    } catch (\Throwable $e) {
+                        error_log('Donation confirmation email error: ' . $e->getMessage());
+                    }
                 }
 
-                Helpers::createNotification(
-                    $donation['donor_id'],
-                    'Contribution Processed',
-                    'Your contribution of NGN ' . number_format($donation['amount'], 2) . ' has been processed and recorded.',
-                    'success',
-                    '/donor/donations'
-                );
+                try {
+                    Helpers::createNotification(
+                        $donation['donor_id'],
+                        'Contribution Processed',
+                        'Your contribution of NGN ' . number_format($donation['amount'], 2) . ' has been processed and recorded.',
+                        'success',
+                        '/donor/donations'
+                    );
+                } catch (\Throwable $e) {
+                    error_log('Notification error: ' . $e->getMessage());
+                }
 
-                Helpers::logActivity($donation['donor_id'], 'donation_completed', "Contribution {$reference} completed");
+                try {
+                    Helpers::logActivity($donation['donor_id'], 'donation_completed', "Contribution {$reference} completed");
+                } catch (\Throwable $e) {
+                    error_log('Activity log error: ' . $e->getMessage());
+                }
 
                 $updatedDonation = $this->donationModel->findById($donation['id']);
                 return Response::success(['donation' => $updatedDonation], 'Payment verified and contribution recorded');

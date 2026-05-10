@@ -127,13 +127,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateProfile = async (data) => {
-    const response = await apiClient.put('/auth/profile', data);
+    const response = await apiClient.post('/auth/profile', data);
     setUser(response.data.data.user);
     return response.data;
   };
 
   const changePassword = async (data) => {
-    const response = await apiClient.put('/auth/change-password', data);
+    const response = await apiClient.post('/auth/change-password', data);
     return response.data;
   };
 

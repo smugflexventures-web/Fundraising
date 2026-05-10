@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, Globe, DollarSign, Shield } from 'lucide-react';
+import { Save, Globe, DollarSign, Shield, Building2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import api from '../../services/api';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -15,6 +15,10 @@ const AdminSettings = () => {
     enable_registration: 'true',
     enable_email_verification: 'true',
     maintenance_mode: 'false',
+    bank_name: 'First Bank of Nigeria',
+    bank_account_number: '2031234567',
+    bank_account_name: 'CampusFund Educational Support',
+    bank_sort_code: '011151003',
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -128,6 +132,35 @@ const AdminSettings = () => {
                 </button>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Bank Account Settings */}
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <Building2 className="w-5 h-5 text-primary-600" />
+            <h3 className="text-lg font-semibold text-gray-800">Bank Account for Manual Transfers</h3>
+          </div>
+          <p className="text-xs text-gray-400 mb-4">These details are shown to donors who select the bank transfer payment method.</p>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
+              <input value={settings.bank_name || ''} onChange={(e) => setSettings({...settings, bank_name: e.target.value})} className="input-field" placeholder="e.g. First Bank of Nigeria" />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+                <input value={settings.bank_account_number || ''} onChange={(e) => setSettings({...settings, bank_account_number: e.target.value})} className="input-field font-mono" placeholder="2031234567" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Sort Code</label>
+                <input value={settings.bank_sort_code || ''} onChange={(e) => setSettings({...settings, bank_sort_code: e.target.value})} className="input-field font-mono" placeholder="011151003" />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Account Name</label>
+              <input value={settings.bank_account_name || ''} onChange={(e) => setSettings({...settings, bank_account_name: e.target.value})} className="input-field" placeholder="CampusFund Educational Support" />
+            </div>
           </div>
         </div>
 

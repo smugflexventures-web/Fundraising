@@ -44,6 +44,7 @@ const DonorDonations = () => {
                   <tr className="border-b border-gray-100">
                     <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Campaign</th>
                     <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Amount</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Method</th>
                     <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
                     <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Date</th>
                     <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Reference</th>
@@ -55,8 +56,15 @@ const DonorDonations = () => {
                       <td className="px-4 py-3 text-sm text-gray-800">{donation.campaign_title || 'General'}</td>
                       <td className="px-4 py-3 text-sm font-semibold text-accent-600">{formatCurrency(donation.amount)}</td>
                       <td className="px-4 py-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          donation.payment_method === 'bank_transfer' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
+                        }`}>
+                          {donation.payment_method === 'bank_transfer' ? 'Bank Transfer' : 'Paystack'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(donation.status)}`}>
-                          {donation.status}
+                          {donation.status === 'pending_verification' ? 'Pending Verification' : donation.status}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-500">{formatDate(donation.created_at)}</td>

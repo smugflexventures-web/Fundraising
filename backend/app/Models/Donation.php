@@ -49,16 +49,6 @@ class Donation
         );
     }
 
-    public function updateStatus($id, $status)
-    {
-        return $this->db->update("UPDATE donations SET status = ? WHERE id = ?", [$status, $id]);
-    }
-
-    public function updateStatusByReference($reference, $status)
-    {
-        return $this->db->update("UPDATE donations SET status = ? WHERE reference = ?", [$status, $reference]);
-    }
-
     public function getByDonorId($donorId, $page = 1, $perPage = 10)
     {
         $total = $this->db->fetch(
@@ -68,16 +58,28 @@ class Donation
 
         $offset = ($page - 1) * $perPage;
         $data = $this->db->fetchAll(
-            "SELECT d.*, c.title as campaign_title 
-             FROM donations d 
-             LEFT JOIN campaigns c ON d.campaign_id = c.id 
-             WHERE d.donor_id = ? 
-             ORDER BY d.created_at DESC 
+            "SELECT d.*, c.title as campaign_title,
+                    p.file_name as proof_file_name, p.file_path as proof_file_path, p.transaction_reference as proof_transaction_ref
+             FROM donations d
+             LEFT JOIN campaigns c ON d.campaign_id = c.id
+             LEFT JOIN bank_transfer_proofs p ON d.id = p.donation_id
+             WHERE d.donor_id = ?
+             ORDER BY d.created_at DESC
              LIMIT {$perPage} OFFSET {$offset}",
             [$donorId]
         );
 
         return ['data' => $data, 'total' => (int)$total];
+    }
+
+    public function updateStatus($id, $status)
+    {
+        return $this->db->update("UPDATE donations SET status = ? WHERE id = ?", [$status, $id]);
+    }
+
+    public function updateStatusByReference($reference, $status)
+    {
+        return $this->db->update("UPDATE donations SET status = ? WHERE reference = ?", [$status, $reference]);
     }
 
     public function getAll($status = null, $page = 1, $perPage = 10)
@@ -100,10 +102,13 @@ class Donation
         $offset = ($page - 1) * $perPage;
         $data = $this->db->fetchAll(
             "SELECT d.*, u.first_name as donor_first_name, u.last_name as donor_last_name, u.email as donor_email,
-                    c.title as campaign_title
+                    c.title as campaign_title,
+                    p.file_name as proof_file_name, p.file_path as proof_file_path, p.transaction_reference as proof_transaction_ref,
+                    p.bank_name as proof_bank_name, p.notes as proof_notes
              FROM donations d 
              JOIN users u ON d.donor_id = u.id 
              LEFT JOIN campaigns c ON d.campaign_id = c.id 
+             LEFT JOIN bank_transfer_proofs p ON d.id = p.donation_id
              {$whereClause} 
              ORDER BY d.created_at DESC 
              LIMIT {$perPage} OFFSET {$offset}",

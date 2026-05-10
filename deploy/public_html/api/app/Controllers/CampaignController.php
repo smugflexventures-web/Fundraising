@@ -111,7 +111,11 @@ class CampaignController
 
         $campaign = $this->campaignModel->findById($campaignId);
 
-        Helpers::logActivity($authUser['user_id'], 'create_campaign', 'Created campaign: ' . $input['title']);
+        try {
+            Helpers::logActivity($authUser['user_id'], 'create_campaign', 'Created campaign: ' . $input['title']);
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success(['campaign' => $campaign], 'Campaign created', 201);
     }
@@ -120,7 +124,7 @@ class CampaignController
     {
         $id = $params['id'] ?? null;
         $authUser = $GLOBALS['auth_user'] ?? null;
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $input = $GLOBALS['request_body'] ?? [];
         $input = Helpers::sanitize($input);
 
         if (!$id) {
@@ -135,7 +139,11 @@ class CampaignController
         $this->campaignModel->update($id, $input);
         $campaign = $this->campaignModel->findById($id);
 
-        Helpers::logActivity($authUser['user_id'], 'update_campaign', "Updated campaign {$id}");
+        try {
+            Helpers::logActivity($authUser['user_id'], 'update_campaign', "Updated campaign {$id}");
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success(['campaign' => $campaign], 'Campaign updated');
     }
@@ -180,7 +188,11 @@ class CampaignController
         $this->campaignModel->update($id, $updateData);
         $campaign = $this->campaignModel->findById($id);
 
-        Helpers::logActivity($authUser['user_id'], 'update_campaign', "Updated campaign {$id}");
+        try {
+            Helpers::logActivity($authUser['user_id'], 'update_campaign', "Updated campaign {$id}");
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success(['campaign' => $campaign], 'Campaign updated');
     }
@@ -206,7 +218,11 @@ class CampaignController
 
         $this->campaignModel->delete($id);
 
-        Helpers::logActivity($authUser['user_id'], 'delete_campaign', "Removed campaign {$id}");
+        try {
+            Helpers::logActivity($authUser['user_id'], 'delete_campaign', "Removed campaign {$id}");
+        } catch (\Throwable $e) {
+            error_log('Activity log error: ' . $e->getMessage());
+        }
 
         return Response::success([], 'Campaign removed');
     }

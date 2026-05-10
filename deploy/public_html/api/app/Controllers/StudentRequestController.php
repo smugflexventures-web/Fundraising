@@ -180,7 +180,7 @@ class StudentRequestController
     {
         $id = $params['id'] ?? null;
         $authUser = $GLOBALS['auth_user'] ?? null;
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $input = $GLOBALS['request_body'] ?? [];
         $input = Helpers::sanitize($input);
 
         if (!$id) {
@@ -216,7 +216,7 @@ class StudentRequestController
     {
         $id = $params['id'] ?? null;
         $authUser = $GLOBALS['auth_user'] ?? null;
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $input = $GLOBALS['request_body'] ?? [];
         $input = Helpers::sanitize($input);
 
         $validator = new Validator($input);

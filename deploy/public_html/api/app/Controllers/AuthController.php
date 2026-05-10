@@ -22,7 +22,7 @@ class AuthController
 
     public function register($params)
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $input = $GLOBALS['request_body'] ?? [];
 
         // Don't sanitize password - special chars must be preserved for hashing
         $rawPassword = $input['password'] ?? '';
@@ -114,7 +114,7 @@ class AuthController
 
     public function login($params)
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $input = $GLOBALS['request_body'] ?? [];
 
         // Don't sanitize password - special chars must be preserved for verification
         $rawPassword = $input['password'] ?? '';
@@ -167,14 +167,18 @@ class AuthController
     {
         $authUser = $GLOBALS['auth_user'] ?? null;
         if ($authUser) {
-            Helpers::logActivity($authUser['user_id'], 'logout', 'User logged out');
+            try {
+                Helpers::logActivity($authUser['user_id'], 'logout', 'User logged out');
+            } catch (\Throwable $e) {
+                error_log('Activity log error: ' . $e->getMessage());
+            }
         }
         return Response::success([], 'Signed out');
     }
 
     public function forgotPassword($params)
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $input = $GLOBALS['request_body'] ?? [];
         $input = Helpers::sanitize($input);
 
         $validator = new Validator($input);
@@ -214,7 +218,7 @@ class AuthController
 
     public function resetPassword($params)
     {
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $input = $GLOBALS['request_body'] ?? [];
 
         // Don't sanitize passwords - special chars must be preserved for hashing
         $rawPassword = $input['password'] ?? '';
@@ -282,7 +286,7 @@ class AuthController
     public function updateProfile($params)
     {
         $authUser = $GLOBALS['auth_user'] ?? null;
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $input = $GLOBALS['request_body'] ?? [];
         $input = Helpers::sanitize($input);
 
         $validator = new Validator($input);
@@ -310,7 +314,7 @@ class AuthController
     public function changePassword($params)
     {
         $authUser = $GLOBALS['auth_user'] ?? null;
-        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $input = $GLOBALS['request_body'] ?? [];
 
         // Don't sanitize passwords - special chars must be preserved
         $rawCurrentPassword = $input['current_password'] ?? '';

@@ -10,7 +10,7 @@ $router = new Router();
 $router->post('/auth/register', 'AuthController@register', ['RateLimitMiddleware']);
 $router->post('/auth/login', 'AuthController@login', ['RateLimitMiddleware']);
 $router->post('/auth/forgot-password', 'AuthController@forgotPassword', ['RateLimitMiddleware']);
-$router->post('/auth/reset-password', 'AuthController@resetPassword');
+$router->post('/auth/reset-password', 'AuthController@resetPassword', ['RateLimitMiddleware']);
 $router->get('/stats/public', 'AdminController@publicStats');
 
 // ============================================
@@ -55,6 +55,16 @@ $router->post('/donations/initialize', 'DonationController@initialize', ['AuthMi
 $router->post('/donations/verify', 'DonationController@verify', ['AuthMiddleware']);
 
 // ============================================
+// Bank Transfer Routes
+// ============================================
+$router->get('/bank-transfer/details', 'BankTransferController@getBankDetails');
+$router->post('/bank-transfer/initialize', 'BankTransferController@initialize', ['AuthMiddleware']);
+$router->post('/bank-transfer/{id}/submit-proof', 'BankTransferController@submitProof', ['AuthMiddleware']);
+$router->get('/bank-transfer/pending', 'BankTransferController@pendingVerifications', ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/bank-transfer/{id}/verify', 'BankTransferController@verifyTransfer', ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/bank-transfer/{id}/reject', 'BankTransferController@rejectTransfer', ['AuthMiddleware', 'AdminMiddleware']);
+
+// ============================================
 // Notification Routes
 // ============================================
 $router->get('/notifications', 'NotificationController@index', ['AuthMiddleware']);
@@ -75,5 +85,24 @@ $router->get('/admin/activity-logs', 'AdminController@activityLogs', ['AuthMiddl
 $router->get('/admin/reports', 'AdminController@reports', ['AuthMiddleware', 'AdminMiddleware']);
 $router->get('/admin/settings', 'AdminController@getSettings', ['AuthMiddleware', 'AdminMiddleware']);
 $router->put('/admin/settings', 'AdminController@updateSettings', ['AuthMiddleware', 'AdminMiddleware']);
+
+// ============================================
+// POST Fallback Routes (for cPanel/Apache that block PUT/DELETE)
+// These use X-HTTP-Method-Override header to map to the real method
+// ============================================
+$router->post('/auth/profile', 'AuthController@updateProfile', ['AuthMiddleware']);
+$router->post('/auth/change-password', 'AuthController@changePassword', ['AuthMiddleware']);
+$router->post('/campaigns/{id}/delete', 'CampaignController@destroy', ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/campaigns/{id}/edit', 'CampaignController@update', ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/requests/{id}/update', 'StudentRequestController@update', ['AuthMiddleware']);
+$router->post('/requests/{id}/status', 'StudentRequestController@updateStatus', ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/requests/{id}/delete', 'StudentRequestController@destroy', ['AuthMiddleware']);
+$router->post('/notifications/{id}/read', 'NotificationController@markRead', ['AuthMiddleware']);
+$router->post('/notifications/read-all', 'NotificationController@markAllRead', ['AuthMiddleware']);
+$router->post('/notifications/{id}/delete', 'NotificationController@destroy', ['AuthMiddleware']);
+$router->post('/admin/users/{id}/verify', 'AdminController@verifyUser', ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/admin/users/{id}/toggle-status', 'AdminController@toggleUserStatus', ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/admin/users/{id}/delete', 'AdminController@deleteUser', ['AuthMiddleware', 'AdminMiddleware']);
+$router->post('/admin/settings', 'AdminController@updateSettings', ['AuthMiddleware', 'AdminMiddleware']);
 
 return $router;

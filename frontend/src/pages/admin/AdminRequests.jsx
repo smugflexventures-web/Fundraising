@@ -166,9 +166,21 @@ const AdminRequests = () => {
                 </>
               )}
               {selectedRequest.status === 'approved' && (
-                <button onClick={() => handleStatusUpdate(selectedRequest.id, 'funded')} className="btn-primary flex items-center gap-2">
-                  <DollarSign className="w-4 h-4" /> Mark as Funded
-                </button>
+                <>
+                  <button onClick={() => handleStatusUpdate(selectedRequest.id, 'funded')} className="btn-primary flex items-center gap-2">
+                    <DollarSign className="w-4 h-4" /> Mark as Funded
+                  </button>
+                  <button
+                    onClick={() => {
+                      const url = `${window.location.origin}/donor/donate-request/${selectedRequest.id}`;
+                      navigator.clipboard.writeText(url);
+                      toast.success('Donation link copied to clipboard');
+                    }}
+                    className="btn-secondary flex items-center gap-2"
+                  >
+                    <DollarSign className="w-4 h-4" /> Copy Donation Link
+                  </button>
+                </>
               )}
               <button onClick={() => setShowModal(false)} className="btn-secondary">Close</button>
             </div>

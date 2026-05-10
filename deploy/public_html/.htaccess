@@ -12,6 +12,8 @@ RewriteRule .* - [E=HTTP_AUTHORIZATION:%1,E=REDIRECT_HTTP_AUTHORIZATION:%1]
 
 # Route API requests to API entrypoint (server-agnostic)
 RewriteCond %{REQUEST_URI} !^/api/setup\.php$ [NC]
+RewriteCond %{REQUEST_URI} !^/api/public/debug_auth\.php$ [NC]
+RewriteCond %{REQUEST_URI} !^/api/public/ [NC]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^api(/.*)?$ api/index.php [QSA,L]

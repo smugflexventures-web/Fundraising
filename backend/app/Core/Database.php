@@ -73,13 +73,15 @@ class Database
     public function fetch(string $sql, array $params = []): ?array
     {
         $stmt = $this->query($sql, $params);
-        return $stmt->fetch();
+        $result = $stmt->fetch();
+        return $result === false ? null : $result;
     }
 
     public function fetchAll(string $sql, array $params = []): array
     {
         $stmt = $this->query($sql, $params);
-        return $stmt->fetchAll();
+        $result = $stmt->fetchAll();
+        return $result === false ? [] : $result;
     }
 
     public function insert(string $sql, array $params = []): string
