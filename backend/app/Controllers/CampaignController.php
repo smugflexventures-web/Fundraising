@@ -10,14 +10,14 @@ use App\Core\Response;
 
 class CampaignController
 {
-    private $campaignModel;
+    private Campaign $campaignModel;
 
     public function __construct()
     {
         $this->campaignModel = new Campaign();
     }
 
-    public function index($params)
+    public function index(array $params)
     {
         $page = (int)($_GET['page'] ?? 1);
         $perPage = (int)($_GET['per_page'] ?? 10);
@@ -40,7 +40,7 @@ class CampaignController
         return Response::paginated($campaigns, $result['total'], $page, $perPage);
     }
 
-    public function show($params)
+    public function show(array $params)
     {
         $id = $params['id'] ?? null;
         if (!$id) {
@@ -63,7 +63,7 @@ class CampaignController
         return Response::success(['campaign' => $campaign]);
     }
 
-    public function store($params)
+    public function store(array $params)
     {
         $authUser = $GLOBALS['auth_user'] ?? null;
         $input = array_map(function ($val) {
@@ -120,7 +120,7 @@ class CampaignController
         return Response::success(['campaign' => $campaign], 'Campaign created', 201);
     }
 
-    public function update($params)
+    public function update(array $params)
     {
         $id = $params['id'] ?? null;
         $authUser = $GLOBALS['auth_user'] ?? null;
@@ -148,7 +148,7 @@ class CampaignController
         return Response::success(['campaign' => $campaign], 'Campaign updated');
     }
 
-    public function updateWithImage($params)
+    public function updateWithImage(array $params)
     {
         $id = $params['id'] ?? null;
         $authUser = $GLOBALS['auth_user'] ?? null;
@@ -197,7 +197,7 @@ class CampaignController
         return Response::success(['campaign' => $campaign], 'Campaign updated');
     }
 
-    public function destroy($params)
+    public function destroy(array $params)
     {
         $id = $params['id'] ?? null;
         $authUser = $GLOBALS['auth_user'] ?? null;
@@ -227,7 +227,7 @@ class CampaignController
         return Response::success([], 'Campaign removed');
     }
 
-    public function featured($params)
+    public function featured(array $params)
     {
         $campaigns = $this->campaignModel->getFeatured();
         $campaigns = array_map(function ($campaign) {
