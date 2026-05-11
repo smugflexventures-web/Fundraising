@@ -115,7 +115,6 @@ class DonationController
             'amount' => (float)$input['amount'] * 100,
             'reference' => $reference,
             'callback_url' => Config::get('APP_URL', 'http://localhost:5173') . '/donation/verify',
-            'channels' => ['card', 'bank', 'bank_transfer', 'ussd', 'mobile_money'],
             'metadata' => json_encode([
                 'donation_id' => $donationId,
                 'donor_id' => $authUser['user_id'],
@@ -279,7 +278,7 @@ class DonationController
                     try {
                         Mailer::sendDonationConfirmation($donor['email'], $donor['first_name'], $donation['amount'], $campaignTitle);
                     } catch (\Throwable $e) {
-                        error_log('Donation email error: ' . $e->getMessage());
+                        error_log('Donation confirmation email error: ' . $e->getMessage());
                     }
                 }
 

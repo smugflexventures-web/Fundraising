@@ -26,6 +26,7 @@ class Request
                 $this->method = strtoupper($override);
             }
         }
+
         $this->uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
         // Strip the /api prefix (deployment rewrites /api/* to api/public/index.php)

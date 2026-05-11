@@ -20,10 +20,8 @@ class App
             'http://localhost:5173',
             'http://localhost:3000',
             'http://127.0.0.1:5173',
-            'https://smugflex.com.ng',
-            'http://smugflex.com.ng',
-            'https://www.smugflex.com.ng',
-            'http://www.smugflex.com.ng',
+            'https://anns.com.gracelandroyalacademy.com.ng',
+            'http://anns.com.gracelandroyalacademy.com.ng',
         ];
 
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';

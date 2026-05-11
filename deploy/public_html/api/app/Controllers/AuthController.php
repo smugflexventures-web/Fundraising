@@ -91,7 +91,6 @@ class AuthController
         } catch (\Throwable $e) {
             error_log('Notification error: ' . $e->getMessage());
         }
-
         try {
             Helpers::logActivity($userId, 'register', 'User registered', $_SERVER['REMOTE_ADDR'] ?? null, $_SERVER['HTTP_USER_AGENT'] ?? null);
         } catch (\Throwable $e) {
@@ -204,7 +203,7 @@ class AuthController
         try {
             Mailer::sendPasswordResetEmail($user['email'], $user['first_name'], $resetLink);
         } catch (\Throwable $e) {
-            error_log('Password reset email error: ' . $e->getMessage());
+            error_log('Reset email error: ' . $e->getMessage());
         }
 
         try {

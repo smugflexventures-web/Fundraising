@@ -249,7 +249,7 @@ class StudentRequestController
                 $request['title']
             );
         } catch (\Throwable $e) {
-            error_log('Request status email error: ' . $e->getMessage());
+            error_log('Status email error: ' . $e->getMessage());
         }
 
         try {
