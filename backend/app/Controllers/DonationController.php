@@ -350,7 +350,7 @@ class DonationController
         )['count'] ?? 0;
 
         $pendingAmount = $db->fetch(
-            "SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE donor_id = ? AND status = 'pending'",
+            "SELECT COALESCE(SUM(amount), 0) as total FROM donations WHERE donor_id = ? AND status IN ('pending', 'pending_verification')",
             [$donorId]
         )['total'] ?? 0;
 

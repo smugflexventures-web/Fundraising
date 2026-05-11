@@ -100,6 +100,7 @@ if ($hasEnv) {
             'activity_logs' => 'Required for admin activity logs',
             'settings' => 'Required for admin settings',
             'payments' => 'Required for payment tracking',
+            'bank_transfer_proofs' => 'Required for bank transfer proof uploads',
         ];
 
         foreach ($requiredTables as $table => $purpose) {

@@ -13,6 +13,7 @@ DROP TABLE IF EXISTS settings;
 DROP TABLE IF EXISTS activity_logs;
 DROP TABLE IF EXISTS password_resets;
 DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS bank_transfer_proofs;
 DROP TABLE IF EXISTS payments;
 DROP TABLE IF EXISTS donations;
 DROP TABLE IF EXISTS campaigns;
@@ -132,7 +133,7 @@ CREATE TABLE donations (
   reference VARCHAR(100) UNIQUE DEFAULT NULL,
   message TEXT DEFAULT NULL,
   is_anonymous BOOLEAN NOT NULL DEFAULT FALSE,
-  status ENUM('pending', 'completed', 'failed', 'refunded') NOT NULL DEFAULT 'pending',
+  status ENUM('pending', 'pending_verification', 'completed', 'failed', 'refunded') NOT NULL DEFAULT 'pending',
   payment_method VARCHAR(50) DEFAULT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -158,17 +159,41 @@ CREATE TABLE payments (
   provider VARCHAR(50) NOT NULL DEFAULT 'paystack',
   amount DECIMAL(12,2) NOT NULL,
   currency VARCHAR(10) NOT NULL DEFAULT 'NGN',
-  status ENUM('initialized', 'processing', 'success', 'failed') NOT NULL DEFAULT 'initialized',
+  status ENUM('initialized', 'processing', 'pending_verification', 'success', 'failed') NOT NULL DEFAULT 'initialized',
   gateway_response TEXT DEFAULT NULL,
   paid_at TIMESTAMP NULL DEFAULT NULL,
+  verified_by INT DEFAULT NULL,
+  verified_at TIMESTAMP NULL DEFAULT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   FOREIGN KEY (donation_id) REFERENCES donations(id) ON DELETE CASCADE,
+  FOREIGN KEY (verified_by) REFERENCES users(id) ON DELETE SET NULL,
   INDEX idx_donation_id (donation_id),
   INDEX idx_transaction_id (transaction_id),
   INDEX idx_status (status),
   INDEX idx_paid_at (paid_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================
+-- Bank Transfer Proofs Table
+-- ============================================
+CREATE TABLE bank_transfer_proofs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  donation_id INT NOT NULL,
+  file_name VARCHAR(255) NOT NULL,
+  file_path VARCHAR(500) NOT NULL,
+  file_type VARCHAR(50) NOT NULL,
+  file_size INT NOT NULL,
+  bank_name VARCHAR(100) DEFAULT NULL,
+  account_name VARCHAR(200) DEFAULT NULL,
+  transaction_reference VARCHAR(100) DEFAULT NULL,
+  notes TEXT DEFAULT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (donation_id) REFERENCES donations(id) ON DELETE CASCADE,
+  INDEX idx_donation_id (donation_id),
+  INDEX idx_transaction_reference (transaction_reference)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================
@@ -300,7 +325,11 @@ INSERT INTO settings (setting_key, setting_value) VALUES
 ('max_donation_amount', '10000000'),
 ('enable_registration', 'true'),
 ('enable_email_verification', 'true'),
-('maintenance_mode', 'false');
+('maintenance_mode', 'false'),
+('bank_name', 'First Bank of Nigeria'),
+('bank_account_number', '2031234567'),
+('bank_account_name', 'CampusFund Educational Support'),
+('bank_sort_code', '011151003');
 
 -- ============================================
 -- Performance Indexes
