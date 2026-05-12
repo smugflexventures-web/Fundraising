@@ -20,8 +20,8 @@ class App
             'http://localhost:5173',
             'http://localhost:3000',
             'http://127.0.0.1:5173',
-            'https://anns.com.gracelandroyalacademy.com.ng',
-            'http://anns.com.gracelandroyalacademy.com.ng',
+            'https://anns.gracelandroyalacademy.com.ng',
+            'http://anns.gracelandroyalacademy.com.ng',
         ];
 
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';

@@ -1,6 +1,6 @@
 # cPanel Deployment Guide — CampusFund
 
-## Domain: anns.com.gracelandroyalacademy.com.ng
+## Domain: anns.gracelandroyalacademy.com.ng
 
 ---
 
@@ -63,7 +63,7 @@ Edit `public_html/api/.env`:
 ```env
 APP_ENV=production
 APP_DEBUG=false
-APP_URL=https://anns.com.gracelandroyalacademy.com.ng
+APP_URL=https://anns.gracelandroyalacademy.com.ng
 
 DB_HOST=localhost
 DB_PORT=3306
@@ -148,8 +148,8 @@ In production, the root `.htaccess` routes `/api/*` to the PHP backend.
 
 ### Step 10: Verify Deployment
 
-1. Visit: `https://anns.com.gracelandroyalacademy.com.ng`
-2. Test API: `https://anns.com.gracelandroyalacademy.com.ng/api/auth/me`
+1. Visit: `https://anns.gracelandroyalacademy.com.ng`
+2. Test API: `https://anns.gracelandroyalacademy.com.ng/api/auth/me`
 3. Test login with seed accounts
 
 ---

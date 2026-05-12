@@ -63,7 +63,7 @@ copyFile(path.join(backendSrc, '.htaccess'), path.join(DEPLOY, 'public_html/api/
 const envContent = `APP_NAME="CampusFund"
 APP_ENV=production
 APP_DEBUG=false
-APP_URL=https://anns.com.gracelandroyalacademy.com.ng
+APP_URL=https://anns.gracelandroyalacademy.com.ng
 
 DB_HOST=localhost
 DB_PORT=3306
